@@ -40,6 +40,8 @@ public class PrivateChatsPlugin extends JavaPlugin {
         
         setupCommands();
         getLogger().at(Level.INFO).log("Successfuly started the Plugin!");
+
+        new DebugChatFactory(getEventRegistry(), privateChatManager);
     }
 
     @Override
