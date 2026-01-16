@@ -3,6 +3,7 @@ package de.feli490.hytale.privatechats;
 import com.hypixel.hytale.server.core.command.system.CommandManager;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import de.feli490.hytale.privatechats.commands.ChatCommand;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,5 +52,6 @@ public class PrivateChatsPlugin extends JavaPlugin {
 
     private void setupCommands() {
         CommandManager commandManager = CommandManager.get();
+        commandManager.registerSystemCommand(new ChatCommand());
     }
 }

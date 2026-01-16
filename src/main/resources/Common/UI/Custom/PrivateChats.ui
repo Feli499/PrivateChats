@@ -1,0 +1,21 @@
+$C = "Common.ui";
+
+$C.@PageOverlay {}
+
+$C.@Container {
+  Anchor: (Width: 1200, Height: 900);
+
+  #Title{
+
+    Group {
+      Background: "icon.png";
+      Anchor: (Left: 10, Height:25, Width:25);
+    }
+
+    $C.@Title{
+      @Text = "Private Chats";
+    }
+  }
+}
+
+$C.@BackButton {}
