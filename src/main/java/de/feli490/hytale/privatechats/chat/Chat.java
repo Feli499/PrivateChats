@@ -14,6 +14,8 @@ public class Chat {
     private final long created;
 
     private final Set<PlayerChatRole> playerChatRoles;
+    private final Set<PlayerChatRole> unmodifiablePlayerChatRoles;
+
     private final List<ChatMessage> messages;
     private final List<ChatMessage> unmodifiableMessageList;
 
@@ -25,6 +27,7 @@ public class Chat {
         playerChatRoles = new HashSet<>();
         messages = new ArrayList<>();
         unmodifiableMessageList = Collections.unmodifiableList(messages);
+        unmodifiablePlayerChatRoles = Collections.unmodifiableSet(playerChatRoles);
     }
 
     public void addChatter(UUID playerId, ChatRole role) {
@@ -51,6 +54,10 @@ public class Chat {
                               .findFirst()
                               .map(PlayerChatRole::getRole)
                               .orElse(null);
+    }
+
+    public Set<PlayerChatRole> getMembers() {
+        return unmodifiablePlayerChatRoles;
     }
 
     public long getCreated() {

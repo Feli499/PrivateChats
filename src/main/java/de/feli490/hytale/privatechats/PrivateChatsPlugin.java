@@ -12,6 +12,8 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class PrivateChatsPlugin extends JavaPlugin {
 
+    private PrivateChatManager privateChatManager;
+
     public PrivateChatsPlugin(@NonNullDecl JavaPluginInit init) {
         super(init);
     }
@@ -28,11 +30,14 @@ public class PrivateChatsPlugin extends JavaPlugin {
             return;
         }
 
+        privateChatManager = new PrivateChatManager();
+
         getLogger().at(Level.INFO).log("Successfuly loaded the Plugin!");
     }
 
     @Override
     protected void start() {
+        
         setupCommands();
         getLogger().at(Level.INFO).log("Successfuly started the Plugin!");
     }
@@ -52,6 +57,6 @@ public class PrivateChatsPlugin extends JavaPlugin {
 
     private void setupCommands() {
         CommandManager commandManager = CommandManager.get();
-        commandManager.registerSystemCommand(new ChatCommand());
+        commandManager.registerSystemCommand(new ChatCommand(privateChatManager));
     }
 }

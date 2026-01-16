@@ -7,14 +7,19 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncC
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.feli490.hytale.privatechats.PrivateChatManager;
 import de.feli490.hytale.privatechats.gui.PrivateChatsUI;
 import de.feli490.hytale.privatechats.utils.CommandUtils;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class ChatCommand extends AbstractAsyncCommand {
-    public ChatCommand() {
+    private final PrivateChatManager chatManager;
+
+    public ChatCommand(PrivateChatManager chatManager) {
         super("chat", "Opens the chat menu");
+
+        this.chatManager = chatManager;
     }
 
     @NonNullDecl
@@ -32,7 +37,7 @@ public class ChatCommand extends AbstractAsyncCommand {
 
                                Ref<EntityStore> reference = playerRef.getReference();
 
-                               PrivateChatsUI privateChatsUI = new PrivateChatsUI(playerRef, CustomPageLifetime.CanDismiss);
+                               PrivateChatsUI privateChatsUI = new PrivateChatsUI(playerRef, CustomPageLifetime.CanDismiss, chatManager);
 
                                player.getPageManager()
                                      .openCustomPage(reference, reference.getStore(), privateChatsUI);
