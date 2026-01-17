@@ -50,7 +50,7 @@ $C.@Container {
             }
         }
 
-        Group {
+        Group #Content {
             LayoutMode: Left;
 
             Group {
@@ -63,13 +63,13 @@ $C.@Container {
                     Text: "Deine Chats";
                 }
 
-                Group {
+                Group #ChatPreviewList {
                     LayoutMode: TopScrolling;
                     ScrollbarStyle: $C.@DefaultScrollbarStyle;
-                    Padding: (Right: 10);
 
-                    Group #ChatPreviews {
+                    Group #ChatPreviewItem {
                         LayoutMode: Top;
+                        Padding: (Right: 5);
                     }
                 }
             }

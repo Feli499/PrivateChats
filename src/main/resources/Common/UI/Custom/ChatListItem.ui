@@ -1,32 +1,36 @@
 $C = "Common.ui";
 
 Group {
+    Anchor: (Height: 50);
     Padding: (Bottom: 5);
 
     Button {
         LayoutMode: Top;
         Background: $C.@InputBoxBackground;
-        Padding: (Full: 5);
+        Padding: (Left:10);
         Style:  ButtonStyle(
             Sounds: $C.@ButtonSounds,
         );
 
+
         Label #ChatName {
             Style: (
-              FontSize: 24,
-              RenderBold: true,
-              TextColor: #93844c,
-              Alignment: Left
+                FontSize: 16,
+                RenderBold: true,
+                TextColor: #93844c
             );
+
+            Text: "Name";
         }
 
         Label #MessagePreview {
             Style: (
-              FontSize: 16,
-              RenderBold: false,
-              TextColor: #808080,
-              Alignment: Left
+                FontSize: 12,
+                RenderBold: false,
+                TextColor: #808080
             );
+
+            Text: "Preview";
         }
     }
 }

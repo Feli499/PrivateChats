@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.feli490.hytale.privatechats.PrivateChatManager;
 import de.feli490.hytale.privatechats.chat.Chat;
 import de.feli490.hytale.privatechats.chat.ChatMessage;
+import java.util.List;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class PrivateChatsUI extends CustomUIPage {
@@ -28,15 +29,13 @@ public class PrivateChatsUI extends CustomUIPage {
             @NonNullDecl UIEventBuilder uiEventBuilder, @NonNullDecl Store<EntityStore> store) {
 
         uiCommandBuilder.append("PrivateChats.ui");
-        updateChatMessages();
-    }
 
-    public void updateChatMessages() {
+        uiCommandBuilder.clear("#ChatPreviewItem");
 
-        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
-
-        uiCommandBuilder.clear("#ChatPreviews");
-        for (Chat chat : chatManager.getSortedChats(playerRef.getUuid())) {
+        uiCommandBuilder.appendInline("#ChatPreviewItem", "Group { LayoutMode: Top; }");
+        List<Chat> sortedChats = chatManager.getSortedChats(playerRef.getUuid());
+        for (int i = 0; i < sortedChats.size(); i++) {
+            Chat chat = sortedChats.get(i);
 
             String previewText = "No messages yet.";
 
@@ -44,8 +43,9 @@ public class PrivateChatsUI extends CustomUIPage {
             if (lastMessage != null)
                 previewText = lastMessage.message();
 
-            uiCommandBuilder.append("#ChatPreviews[" + chat.getId() + "] #hatName.Text", chat.getChatName());
-            uiCommandBuilder.append("#ChatPreviews[" + chat.getId() + "] #MessagePreview.Text", previewText);
+            uiCommandBuilder.append("#ChatPreviewItem", "ChatListItem.ui");
+            //            uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #ChatName.Text", chat.getChatName());
+            //            uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #MessagePreview.Text", previewText);
         }
 
         sendUpdate(uiCommandBuilder, false);
