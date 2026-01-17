@@ -10,7 +10,7 @@ Group {
         Text: "Label #ChatName";
     }
 
-    Group #MessageList {
+    Group {
         FlexWeight: 1;
         LayoutMode: TopScrolling;
         ScrollbarStyle: $C.@DefaultScrollbarStyle;

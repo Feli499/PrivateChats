@@ -66,8 +66,8 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             ChatMessage chatMessage = messages.get(i);
             uiCommandBuilder.append(selector, "ChatMessage.ui");
 
-            //            uiCommandBuilder.set(selector + "[" + i + "] #ChatName.Text", chat.getChatName());
-            //            uiCommandBuilder.set(selector + "[" + i + "] #MessagePreview.Text", previewText);
+            uiCommandBuilder.set(selector + "[" + i + "] #DisplayName.Text", chatMessage.id() + ": ");
+            uiCommandBuilder.set(selector + "[" + i + "] #Message.Text", chatMessage.message());
         }
 
         sendUpdate(uiCommandBuilder, false);
