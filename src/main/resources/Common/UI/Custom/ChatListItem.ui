@@ -4,7 +4,7 @@ Group {
     Anchor: (Height: 50);
     Padding: (Bottom: 5);
 
-    Button {
+    Button #OpenChatButton {
         LayoutMode: Top;
         Background: $C.@InputBoxBackground;
         Padding: (Left:10);
