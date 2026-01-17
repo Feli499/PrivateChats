@@ -85,7 +85,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             ChatMessage chatMessage = messages.get(i);
             uiCommandBuilder.append(selector, "ChatMessage.ui");
 
-            uiCommandBuilder.set(selector + "[" + i + "] #DisplayName.Text", chatMessage.id() + ": ");
+            uiCommandBuilder.set(selector + "[" + i + "] #DisplayName.Text", chatMessage.senderId() + ": ");
             uiCommandBuilder.set(selector + "[" + i + "] #Message.Text", chatMessage.message());
             uiCommandBuilder.set(selector + "[" + i + "].TooltipTextSpans", MessageUtils.formatTimestamp(chatMessage.timestamp()));
         }
@@ -96,6 +96,10 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     private void createMessage(String message) {
         currentChat.sendMessage(playerRef.getUuid(), message);
         rewriteMessages();
+
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        uiCommandBuilder.set("#ChatView[0] #NewMessage.Value", "");
+        sendUpdate(uiCommandBuilder, false);
     }
 
     @Override
