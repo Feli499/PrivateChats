@@ -58,9 +58,16 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         uiCommandBuilder.clear("#ChatView");
         uiCommandBuilder.append("#ChatView", "ChatView.ui");
 
-        uiCommandBuilder.set("#ChatView[0] #ChatName.Text", currentChat.getChatName());
+        String prefix = "#ChatView[0] ";
+        uiCommandBuilder.set(prefix + "#ChatName.Text", currentChat.getChatName());
 
-        sendUpdate(uiCommandBuilder, false);
+        UIEventBuilder uiEventBuilder = new UIEventBuilder();
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating,
+                                       prefix + "#SendMessageButton",
+                                       EventData.of(PrivateChatData.KEY_MESSAGE_TEXT, prefix + "#NewMessage.Value"),
+                                       false);
+
+        sendUpdate(uiCommandBuilder, uiEventBuilder, false);
 
         rewriteMessages();
     }
@@ -69,8 +76,10 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
 
-        List<ChatMessage> messages = currentChat.getMessages();
         String selector = "#ChatView[0] #MessageItem";
+        uiCommandBuilder.clear(selector);
+
+        List<ChatMessage> messages = currentChat.getMessages();
 
         for (int i = 0; i < messages.size(); i++) {
             ChatMessage chatMessage = messages.get(i);
@@ -84,12 +93,19 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         sendUpdate(uiCommandBuilder, false);
     }
 
+    private void createMessage(String message) {
+        currentChat.sendMessage(playerRef.getUuid(), message);
+        rewriteMessages();
+    }
+
     @Override
     public void handleDataEvent(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store,
             @NonNullDecl PrivateChatData data) {
         super.handleDataEvent(ref, store, data);
 
-        if (data.displayChat != null//
+        if (data.writtenMessage != null) {
+            createMessage(data.writtenMessage);
+        } else if (data.displayChat != null//
                 && (Objects.isNull(currentChat) || !Objects.equals(currentChat.getId(), data.displayChat)))
             setSelectedChat(getChat(data.displayChat));
     }
@@ -111,7 +127,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #MessagePreview.Text", previewText);
             uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating,
                                            "#ChatPreviewItem[" + i + "] #OpenChatButton",
-                                           EventData.of("DisplayChatButtonAction",
+                                           EventData.of(PrivateChatData.KEY_DISPLAY_CHAT_BUTTON_ACTION,
                                                         chat.getId()
                                                             .toString()),
                                            false);
@@ -130,15 +146,21 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     public static class PrivateChatData {
 
         static final String KEY_DISPLAY_CHAT_BUTTON_ACTION = "DisplayChatButtonAction";
+        static final String KEY_MESSAGE_TEXT = "@MessageText";
 
         public static final BuilderCodec<PrivateChatData> CODEC = BuilderCodec.builder(PrivateChatData.class, PrivateChatData::new)
                                                                               .addField(new KeyedCodec<>(KEY_DISPLAY_CHAT_BUTTON_ACTION,
                                                                                                          Codec.UUID_STRING),
                                                                                         PrivateChatData::setDisplayChat,
                                                                                         PrivateChatData::getDisplayChat)
+                                                                              .addField(new KeyedCodec<>(KEY_MESSAGE_TEXT, Codec.STRING),
+                                                                                        PrivateChatData::setWrittenMessage,
+                                                                                        PrivateChatData::getWrittenMessage)
                                                                               .build();
 
         private UUID displayChat;
+        private String writtenMessage;
+        private String sendMessage;
 
         public PrivateChatData() {}
 
@@ -148,6 +170,14 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
         public void setDisplayChat(UUID displayChat) {
             this.displayChat = displayChat;
+        }
+
+        public String getWrittenMessage() {
+            return writtenMessage;
+        }
+
+        public void setWrittenMessage(String writtenMessage) {
+            this.writtenMessage = writtenMessage;
         }
     }
 }

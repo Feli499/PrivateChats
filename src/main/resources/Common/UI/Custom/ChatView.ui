@@ -29,7 +29,6 @@ Group {
               Background: $C.@InputBoxBackground;
               FlexWeight: 1;
               PlaceholderText: "Search...";
-              Value: "TextField #NewMessage";
         }
 
         $C.@TextButton #SendMessageButton {
