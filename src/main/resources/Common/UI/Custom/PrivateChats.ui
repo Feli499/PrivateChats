@@ -54,8 +54,6 @@ $C.@Container {
             LayoutMode: Left;
 
             Group {
-                OutlineColor: #e8ec1a(0.5);
-                OutlineSize: 1.5;
                 Anchor: (Width: 200);
                 LayoutMode: Top;
 
@@ -70,6 +68,17 @@ $C.@Container {
                     Group #ChatPreviewItem {
                         LayoutMode: Top;
                     }
+                }
+            }
+
+            Group #ChatView {
+                FlexWeight: 1;
+                LayoutMode: Top;
+                OutlineColor: #e8ec1a(0.5);
+                OutlineSize: 1.5;
+
+                Label #ChatLabel{
+                    Text: "No Chat selected";
                 }
             }
         }

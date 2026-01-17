@@ -1,0 +1,14 @@
+$C = "Common.ui";
+
+Group {
+    LayoutMode: Left;
+    OutlineColor: #f87c5a(0.7);
+    OutlineSize: 1.5;
+
+    Label #DisplayName {
+        Text: "Label #DisplayName";
+    }
+    Label #Message {
+        Text: "Label #Message";
+    }
+}

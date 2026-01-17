@@ -17,17 +17,20 @@ import de.feli490.hytale.privatechats.PrivateChatManager;
 import de.feli490.hytale.privatechats.chat.Chat;
 import de.feli490.hytale.privatechats.chat.ChatMessage;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.PrivateChatData> {
 
-    private final PrivateChatManager chatManager;
+    private final List<Chat> chats;
+    private Chat currentChat;
 
     public PrivateChatsUI(@NonNullDecl PlayerRef playerRef, @NonNullDecl CustomPageLifetime lifetime, PrivateChatManager chatManager) {
         super(playerRef, lifetime, PrivateChatData.CODEC);
 
-        this.chatManager = chatManager;
+        chats = chatManager.getSortedChats(playerRef.getUuid());
+        currentChat = null;
     }
 
     @Override
@@ -35,15 +38,40 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             @NonNullDecl UIEventBuilder uiEventBuilder, @NonNullDecl Store<EntityStore> store) {
 
         uiCommandBuilder.append("PrivateChats.ui");
-        updateChatMessages(uiCommandBuilder, uiEventBuilder);
+        updateChatList(uiCommandBuilder, uiEventBuilder);
     }
 
-    private void updateChatMessages(UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder) {
+    private Chat getChat(UUID chatId) {
+        return chats.stream()
+                    .filter(chat -> chat.getId()
+                                        .equals(chatId))
+                    .findFirst()
+                    .orElse(null);
+    }
+
+    public void setSelectedChat(Chat chat) {
+        currentChat = chat;
+
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        uiCommandBuilder.set("#ChatLabel.Text", chat.getChatName() + " (" + chat.getId() + ")");
+        sendUpdate(uiCommandBuilder, false);
+    }
+
+    @Override
+    public void handleDataEvent(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store,
+            @NonNullDecl PrivateChatData data) {
+        super.handleDataEvent(ref, store, data);
+
+        if (data.displayChat != null//
+                && (Objects.isNull(currentChat) || !Objects.equals(currentChat.getId(), data.displayChat)))
+            setSelectedChat(getChat(data.displayChat));
+    }
+
+    private void updateChatList(UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder) {
         uiCommandBuilder.clear("#ChatPreviewItem");
 
-        List<Chat> sortedChats = chatManager.getSortedChats(playerRef.getUuid());
-        for (int i = 0; i < sortedChats.size(); i++) {
-            Chat chat = sortedChats.get(i);
+        for (int i = 0; i < chats.size(); i++) {
+            Chat chat = chats.get(i);
 
             String previewText = "No messages yet.";
 
@@ -63,11 +91,13 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         }
     }
 
-    @Override
-    public void handleDataEvent(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store,
-            @NonNullDecl PrivateChatData data) {
-        super.handleDataEvent(ref, store, data);
-        
+    private void reloadChats() {
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        UIEventBuilder uiEventBuilder = new UIEventBuilder();
+
+        updateChatList(uiCommandBuilder, uiEventBuilder);
+
+        sendUpdate(uiCommandBuilder, uiEventBuilder, false);
     }
 
     public static class PrivateChatData {

@@ -1,0 +1,43 @@
+$C = "Common.ui";
+
+Group {
+    LayoutMode: Top;
+
+    Group {
+        OutlineColor: #08ec1a(0.5);
+        OutlineSize: 1.5;
+        LayoutMode: Top;
+
+        Label #ChatName{
+            Text: "Label #ChatName";
+        }
+
+        Group #MessageList {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+            Group #MessageItem {
+                LayoutMode: Top;
+            }
+        }
+
+        Group {
+            Anchor: (Bottom: 0, Height: 50);
+            LayoutMode: Left;
+
+            TextField #NewMessage {
+                  Style: $C.@DefaultInputFieldStyle;
+                  Background: $C.@InputBoxBackground;
+                  FlexWeight: 1;
+                  PlaceholderText: "Search...";
+                  Value: "TextField #NewMessage";
+            }
+
+            $C.@TextButton #SendMessageButton {
+                Anchor: (Width: 50, Right: 0);
+                Text: "Send";
+            }
+        }
+    }
+}
