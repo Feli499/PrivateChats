@@ -41,7 +41,8 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
     @Override
     public void onDismiss(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
-        super.onDismiss(ref, store);
+        if (currentChat != null)
+            currentChat.removeNewMessageListener(this);
     }
 
     @Override
