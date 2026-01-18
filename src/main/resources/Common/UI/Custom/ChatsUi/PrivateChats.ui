@@ -1,4 +1,4 @@
-$C = "Common.ui";
+$C = "../Common.ui";
 
 $C.@PageOverlay {}
 
@@ -8,7 +8,7 @@ $C.@Container {
     #Title{
 
         Group {
-            Background: "icon.png";
+            Background: "../icon.png";
             Anchor: (Left: 10, Height:25, Width:25);
         }
 

@@ -48,7 +48,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     public void build(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl UICommandBuilder uiCommandBuilder,
             @NonNullDecl UIEventBuilder uiEventBuilder, @NonNullDecl Store<EntityStore> store) {
 
-        uiCommandBuilder.append("PrivateChats.ui");
+        uiCommandBuilder.append("ChatsUi/PrivateChats.ui");
 
         updateChatList(uiCommandBuilder, uiEventBuilder);
     }
@@ -71,7 +71,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
         uiCommandBuilder.clear("#ChatView");
-        uiCommandBuilder.append("#ChatView", "ChatView.ui");
+        uiCommandBuilder.append("#ChatView", "ChatsUi/ChatView.ui");
 
         String prefix = "#ChatView[0] ";
         uiCommandBuilder.set(prefix + "#ChatName.Text", currentChat.getChatName(playerRef.getUuid()));
@@ -98,7 +98,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
         for (int i = 0; i < messages.size(); i++) {
             ChatMessage chatMessage = messages.get(i);
-            uiCommandBuilder.append(selector, "ChatMessage.ui");
+            uiCommandBuilder.append(selector, "ChatsUi/ChatMessage.ui");
 
             UUID playerUUID = chatMessage.senderId();
             String lastPlayerName = playerDataProvider.getLastPlayerName(playerUUID);
@@ -145,7 +145,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             if (lastMessage != null)
                 previewText = lastMessage.message();
 
-            uiCommandBuilder.append("#ChatPreviewItem", "ChatListItem.ui");
+            uiCommandBuilder.append("#ChatPreviewItem", "ChatsUi/ChatListItem.ui");
             uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #ChatName.Text", chat.getChatName(playerRef.getUuid()));
             uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #MessagePreview.Text", previewText);
             uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating,
