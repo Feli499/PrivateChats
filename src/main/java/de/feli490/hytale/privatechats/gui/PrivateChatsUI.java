@@ -16,13 +16,14 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.feli490.hytale.privatechats.PrivateChatManager;
 import de.feli490.hytale.privatechats.chat.Chat;
 import de.feli490.hytale.privatechats.chat.ChatMessage;
+import de.feli490.hytale.privatechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.utils.hytale.utils.MessageUtils;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.PrivateChatData> {
+public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.PrivateChatData> implements ReceivedNewMessageListener {
 
     private final List<Chat> chats;
     private Chat currentChat;
@@ -32,6 +33,11 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
         chats = chatManager.getSortedChats(playerRef.getUuid());
         currentChat = null;
+    }
+
+    @Override
+    public void onDismiss(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
+        super.onDismiss(ref, store);
     }
 
     @Override
@@ -52,7 +58,12 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     }
 
     public void setSelectedChat(Chat chat) {
+
+        if (currentChat != null)
+            currentChat.removeNewMessageListener(this);
+
         currentChat = chat;
+        currentChat.addNewMessageListener(this);
 
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
         uiCommandBuilder.clear("#ChatView");
@@ -95,7 +106,6 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
     private void createMessage(String message) {
         currentChat.sendMessage(playerRef.getUuid(), message);
-        rewriteMessages();
 
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
         uiCommandBuilder.set("#ChatView[0] #NewMessage.Value", "");
@@ -145,6 +155,11 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         updateChatList(uiCommandBuilder, uiEventBuilder);
 
         sendUpdate(uiCommandBuilder, uiEventBuilder, false);
+    }
+
+    @Override
+    public void onMessage(ChatMessage message) {
+        rewriteMessages();
     }
 
     public static class PrivateChatData {

@@ -1,5 +1,7 @@
 package de.feli490.hytale.privatechats.chat;
 
+import de.feli490.hytale.privatechats.chat.listeners.MemberChangedListener;
+import de.feli490.hytale.privatechats.chat.listeners.ReceivedNewMessageListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,6 +21,9 @@ public class Chat {
     private final List<ChatMessage> messages;
     private final List<ChatMessage> unmodifiableMessageList;
 
+    private final Set<ReceivedNewMessageListener> messageListeners = new HashSet<>();
+    private final Set<MemberChangedListener> memberChangedListeners = new HashSet<>();
+
     private Chat(UUID id, ChatType chatType, long created) {
         this.id = id;
         this.chatType = chatType;
@@ -30,17 +35,56 @@ public class Chat {
         unmodifiablePlayerChatRoles = Collections.unmodifiableSet(playerChatRoles);
     }
 
+    public void addNewMessageListener(ReceivedNewMessageListener listener) {
+        messageListeners.add(listener);
+    }
+
+    public boolean isNewMessageListenerRegistered(ReceivedNewMessageListener listener) {
+        return messageListeners.contains(listener);
+    }
+
+    public void removeNewMessageListener(ReceivedNewMessageListener listener) {
+        messageListeners.remove(listener);
+    }
+
+    public void addMemberChangedListener(MemberChangedListener listener) {
+        memberChangedListeners.add(listener);
+    }
+
+    public boolean isMemberChangedListenerRegistered(MemberChangedListener listener) {
+        return memberChangedListeners.contains(listener);
+    }
+
+    public void removeMemberChangedListener(MemberChangedListener listener) {
+        memberChangedListeners.add(listener);
+    }
+
     public void addChatter(UUID playerId, ChatRole role) {
-        playerChatRoles.add(new PlayerChatRole(playerId, role));
+        PlayerChatRole playerChatRole = new PlayerChatRole(playerId, role);
+        playerChatRoles.add(playerChatRole);
+        memberChangedListeners.forEach(listener -> listener.onMemberAdded(playerChatRole));
     }
 
     public void sendMessage(UUID senderId, String message) {
-        messages.add(new ChatMessage(UUID.randomUUID(), senderId, message, System.currentTimeMillis()));
+
+        ChatMessage chatMessage = new ChatMessage(UUID.randomUUID(), senderId, message, System.currentTimeMillis());
+        messages.add(chatMessage);
+        messageListeners.forEach(listener -> listener.onMessage(chatMessage));
     }
 
     public void removeChatter(UUID playerId) {
-        playerChatRoles.removeIf(playerChatRole -> playerChatRole.getPlayerId()
-                                                                 .equals(playerId));
+
+        PlayerChatRole playerChatRole = getPlayerChatRole(playerId);
+        playerChatRoles.remove(playerChatRole);
+        memberChangedListeners.forEach(listener -> listener.onMemberRemoved(playerChatRole));
+    }
+
+    private PlayerChatRole getPlayerChatRole(UUID playerId) {
+        return playerChatRoles.stream()
+                              .filter(playerChatRole -> playerChatRole.getPlayerId()
+                                                                      .equals(playerId))
+                              .findFirst()
+                              .orElse(null);
     }
 
     public String getChatName() {
