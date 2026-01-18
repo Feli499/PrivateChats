@@ -23,6 +23,8 @@ public class ChatCommand extends AbstractAsyncCommand {
 
         this.chatManager = chatManager;
         this.playerDataProvider = playerDataProvider;
+
+        requirePermission("privatechats.chat");
     }
 
     @NonNullDecl
