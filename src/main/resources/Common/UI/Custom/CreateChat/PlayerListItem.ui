@@ -4,7 +4,7 @@ Group {
     Anchor: (Height: 50);
     Padding: (Bottom: 5, Right: 5);
 
-    Button #OpenChatButton {
+    Button {
         LayoutMode: Left;
         Background: $C.@InputBoxBackground;
         Padding: (Left:10);
@@ -12,9 +12,14 @@ Group {
             Sounds: $C.@ButtonSounds,
         );
 
-        $C.@CheckBoxWithLabel #PlayerCheckbox {
-            @Text = "#PlayerCheckbox.Text";
-            @Checked = false;
+        $C.@CheckBox #IsSelected {
+            Value: false;
+        }
+
+        Label #PlayerName {
+            Anchor: (Right: 30, Left: 11);
+
+            Text: "Label #PlayerName";
         }
     }
 }

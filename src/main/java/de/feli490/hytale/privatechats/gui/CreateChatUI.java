@@ -26,10 +26,11 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateChatData> {
 
-    private final List<UUID> selectedPlayerUUIDs;
     private final PrivateChatManager chatManager;
     private final PlayerDataProvider playerDataProvider;
     private final Supplier<CustomUIPage> returnPageSupplier;
+
+    private final List<UUID> selectedPlayerUUIDs;
     private String playerSearchQuery = "";
 
     public CreateChatUI(@NonNullDecl PlayerRef playerRef, @NonNullDecl CustomPageLifetime lifetime, PrivateChatManager chatManager,
@@ -40,6 +41,7 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
         this.returnPageSupplier = returnPageSupplier;
 
         selectedPlayerUUIDs = new ArrayList<>();
+        selectedPlayerUUIDs.add(playerRef.getUuid());
     }
 
     public CreateChatUI(@NonNullDecl PlayerRef playerRef, @NonNullDecl CustomPageLifetime lifetime, PrivateChatManager chatManager,
@@ -71,13 +73,18 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
 
         int column = 0;
         int row = 0;
-        for (UUID allKnownPlayerUUID : playerDataProvider.getAllKnownPlayerUUIDs()) {
+        for (UUID currentUUID : playerDataProvider.getAllKnownPlayerUUIDs()) {
+            if (currentUUID.equals(playerRef.getUuid()))
+                continue;
 
             if (column == 0) {
                 uiCommandBuilder.appendInline("#PlayerItems", "Group { LayoutMode: Left; Anchor: (Bottom: 0); }");
             }
 
             uiCommandBuilder.append("#PlayerItems[" + row + "]", "CreateChat/PlayerListItem.ui");
+            uiCommandBuilder.set("#PlayerItems[" + row + "][" + column + "] #IsSelected.Value", selectedPlayerUUIDs.contains(currentUUID));
+            uiCommandBuilder.set("#PlayerItems[" + row + "][" + column + "] #PlayerName.Text",
+                                 playerDataProvider.getLastPlayerName(currentUUID));
 
             ++column;
             if (column >= 3) {
