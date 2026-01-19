@@ -106,7 +106,17 @@ public class Chat {
             return lastPlayerName;
         }
 
-        return chatType.name() + ": " + playerChatRoles.size();
+        StringBuilder stringBuilder = new StringBuilder(chatType.name());
+        for (PlayerChatRole playerChatRole : playerChatRoles) {
+            if (playerChatRole.getPlayerId()
+                              .equals(chatNameFor))
+                continue;
+
+            stringBuilder.append(playerDataProvider.getLastPlayerName(playerChatRole.getPlayerId()))
+                         .append(", ");
+        }
+        stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+        return stringBuilder.toString();
     }
 
     public ChatRole getRole(UUID playerId) {
