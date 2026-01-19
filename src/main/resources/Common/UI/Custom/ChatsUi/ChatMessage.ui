@@ -7,8 +7,18 @@ Button {
 
     Label #DisplayName {
         Text: "Label #DisplayName";
+        Style: (
+            FontSize: 18,
+            TextColor: #96a9be,
+            RenderBold: true
+        );
     }
     Label #Message {
         Text: "Label #Message";
+        Style: (
+            FontSize: 18,
+            TextColor: #ffffff,
+            Wrap: true
+        );
     }
 }

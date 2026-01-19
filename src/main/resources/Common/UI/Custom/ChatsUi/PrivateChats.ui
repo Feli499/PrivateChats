@@ -40,6 +40,9 @@ $C.@Container {
 
         Group #Content {
             LayoutMode: Left;
+            FlexWeight: 1;
+            OutlineColor: #ec3f44(0.5);
+            OutlineSize: 1.5;
 
             Group {
                 Anchor: (Width: 200);
@@ -67,6 +70,15 @@ $C.@Container {
 
                 Label #ChatLabel{
                     Text: "No Chat selected";
+                    FlexWeight: 1;
+                    Style: (
+                        FontSize: 18,
+                        TextColor: #96a9be,
+                        VerticalAlignment: Center,
+                        HorizontalAlignment: Center,
+                        RenderBold: true,
+                        Wrap: true
+                    );
                 }
             }
         }
