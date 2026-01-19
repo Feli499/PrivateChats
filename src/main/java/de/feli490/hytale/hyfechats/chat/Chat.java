@@ -67,7 +67,7 @@ public class Chat {
     public void addChatter(UUID playerId, ChatRole role) {
         PlayerChatRole playerChatRole = new PlayerChatRole(playerId, role);
         playerChatRoles.add(playerChatRole);
-        memberChangedListeners.forEach(listener -> listener.onMemberAdded(playerChatRole));
+        memberChangedListeners.forEach(listener -> listener.onMemberAdded(this, playerChatRole));
     }
 
     public void sendMessage(UUID senderId, String message) {
@@ -82,7 +82,7 @@ public class Chat {
 
         PlayerChatRole playerChatRole = getPlayerChatRole(playerId);
         playerChatRoles.remove(playerChatRole);
-        memberChangedListeners.forEach(listener -> listener.onMemberRemoved(playerChatRole));
+        memberChangedListeners.forEach(listener -> listener.onMemberRemoved(this, playerChatRole));
     }
 
     private PlayerChatRole getPlayerChatRole(UUID playerId) {

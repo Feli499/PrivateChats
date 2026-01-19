@@ -1,14 +1,30 @@
 package de.feli490.hytale.hyfechats.chat;
 
+import de.feli490.hytale.hyfechats.chat.listeners.MemberChangedListener;
+import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
+import de.feli490.hytale.hyfechats.data.ChatData;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class ChatFactory {
 
     private final PlayerDataProvider playerDataProvider;
 
+    private final Set<ReceivedNewMessageListener> messageListeners = new HashSet<>();
+    private final Set<MemberChangedListener> memberListeners = new HashSet<>();
+
     public ChatFactory(PlayerDataProvider playerDataProvider) {
         this.playerDataProvider = playerDataProvider;
+    }
+
+    public void addMessageListenerForCreation(ReceivedNewMessageListener listener) {
+        messageListeners.add(listener);
+    }
+
+    public void addMemberChangedListenerForCreation(MemberChangedListener listener) {
+        memberListeners.add(listener);
     }
 
     public Chat createDirect(UUID player1, UUID player2) {
@@ -25,6 +41,19 @@ public class ChatFactory {
     }
 
     private Chat createChat(ChatType chatType) {
-        return new Chat(UUID.randomUUID(), chatType, System.currentTimeMillis(), playerDataProvider);
+        Chat chat = new Chat(UUID.randomUUID(), chatType, System.currentTimeMillis(), playerDataProvider);
+        registerListeners(chat);
+        return chat;
+    }
+
+    private void registerListeners(Chat chat) {
+        memberListeners.forEach(chat::addMemberChangedListener);
+        messageListeners.forEach(chat::addNewMessageListener);
+    }
+
+    public Chat fromChatData(ChatData loadChat) {
+        Chat chat = Chat.fromChatData(loadChat, playerDataProvider);
+        registerListeners(chat);
+        return chat;
     }
 }

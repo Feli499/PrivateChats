@@ -5,6 +5,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import de.feli490.hytale.hyfechats.chat.ChatFactory;
 import de.feli490.hytale.hyfechats.commands.ChatCommand;
+import de.feli490.hytale.hyfechats.data.ChatDataLoader;
+import de.feli490.hytale.hyfechats.data.JsonChatDataLoader;
+import de.feli490.hytale.hyfechats.data.MemoryChatDataLoader;
 import de.feli490.utils.hytale.PlayerDataProviderInstance;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import java.io.IOException;
@@ -34,9 +37,19 @@ public class HyFeChatsPlugin extends JavaPlugin {
             return;
         }
 
+        ChatDataLoader chatDataLoader;
+        try {
+            chatDataLoader = new JsonChatDataLoader(getLogger(), getDataDirectory().resolve("chats"));
+        } catch (Exception e) {
+            chatDataLoader = new MemoryChatDataLoader();
+            getLogger().at(Level.SEVERE)
+                       .withCause(e)
+                       .log("Could not load chats! Using MemoryChatDataLoader instead...");
+        }
+
         playerDataProvider = PlayerDataProviderInstance.get();
         ChatFactory chatFactory = new ChatFactory(playerDataProvider);
-        privateChatManager = new PrivateChatManager(chatFactory);
+        privateChatManager = new PrivateChatManager(getLogger(), chatFactory, chatDataLoader);
 
         getLogger().at(Level.INFO).log("Successfuly loaded the Plugin!");
     }
