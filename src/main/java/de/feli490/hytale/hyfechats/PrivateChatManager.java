@@ -54,6 +54,13 @@ public class PrivateChatManager {
         }
     }
 
+    public Chat getLastChat(UUID playerId) {
+        return chats.stream()
+                    .filter(chat -> chat.isMember(playerId))
+                    .max(Comparator.comparingLong(Chat::getLastUpdate))
+                    .orElse(null);
+    }
+
     public Chat createGroupChat(UUID owner) {
         Chat group = chatFactory.createGroup(owner);
 

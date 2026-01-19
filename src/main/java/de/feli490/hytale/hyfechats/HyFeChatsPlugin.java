@@ -5,6 +5,8 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import de.feli490.hytale.hyfechats.chat.ChatFactory;
 import de.feli490.hytale.hyfechats.commands.ChatCommand;
+import de.feli490.hytale.hyfechats.commands.MsgCommand;
+import de.feli490.hytale.hyfechats.commands.ResponseCommand;
 import de.feli490.hytale.hyfechats.data.ChatDataLoader;
 import de.feli490.hytale.hyfechats.data.JsonChatDataLoader;
 import de.feli490.hytale.hyfechats.data.MemoryChatDataLoader;
@@ -78,5 +80,7 @@ public class HyFeChatsPlugin extends JavaPlugin {
     private void setupCommands() {
         CommandManager commandManager = CommandManager.get();
         commandManager.registerSystemCommand(new ChatCommand(privateChatManager, playerDataProvider));
+        commandManager.registerSystemCommand(new ResponseCommand(privateChatManager));
+        commandManager.registerSystemCommand(new MsgCommand(privateChatManager, playerDataProvider));
     }
 }
