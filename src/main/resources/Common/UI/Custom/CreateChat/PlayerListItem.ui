@@ -1,7 +1,7 @@
 $C = "../Common.ui";
 
 Group {
-    Anchor: (Height: 50);
+    Anchor: (Height: 50, Width: 600/2);
     Padding: (Bottom: 5, Right: 5);
 
     Button {
