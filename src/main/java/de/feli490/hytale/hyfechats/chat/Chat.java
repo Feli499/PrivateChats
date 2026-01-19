@@ -73,7 +73,8 @@ public class Chat {
 
         ChatMessage chatMessage = new ChatMessage(UUID.randomUUID(), senderId, message, System.currentTimeMillis());
         messages.add(chatMessage);
-        messageListeners.forEach(listener -> listener.onMessage(chatMessage));
+        List.copyOf(messageListeners)
+            .forEach(listener -> listener.onMessage(this, chatMessage));
     }
 
     public void removeChatter(UUID playerId) {

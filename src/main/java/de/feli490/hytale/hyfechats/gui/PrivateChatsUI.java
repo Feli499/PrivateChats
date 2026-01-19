@@ -21,6 +21,7 @@ import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import de.feli490.utils.hytale.utils.MessageUtils;
 import de.feli490.utils.hytale.utils.PlayerUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,7 +29,7 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.PrivateChatData> implements ReceivedNewMessageListener {
 
-    private final List<Chat> chats;
+    private List<Chat> chats;
     private final PlayerDataProvider playerDataProvider;
     private final PrivateChatManager chatManager;
     private Chat currentChat;
@@ -38,8 +39,8 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         super(playerRef, lifetime, PrivateChatData.CODEC);
         this.playerDataProvider = playerDataProvider;
         this.chatManager = chatManager;
+        this.chats = Collections.emptyList();
 
-        chats = this.chatManager.getSortedChats(playerRef.getUuid());
         currentChat = null;
     }
 
@@ -73,11 +74,7 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
     public void setSelectedChat(Chat chat) {
 
-        if (currentChat != null)
-            currentChat.removeNewMessageListener(this);
-
         currentChat = chat;
-        currentChat.addNewMessageListener(this);
 
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
         uiCommandBuilder.clear("#ChatView");
@@ -157,6 +154,17 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     }
 
     private void updateChatList(UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder) {
+
+        for (Chat chat : chats) {
+            chat.removeNewMessageListener(this);
+        }
+
+        chats = chatManager.getSortedChats(playerRef.getUuid());
+
+        for (Chat chat : chats) {
+            chat.addNewMessageListener(this);
+        }
+
         uiCommandBuilder.clear("#ChatPreviewItem");
 
         for (int i = 0; i < chats.size(); i++) {
@@ -190,8 +198,11 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
     }
 
     @Override
-    public void onMessage(ChatMessage message) {
-        rewriteMessages();
+    public void onMessage(Chat chat, ChatMessage message) {
+        if (currentChat == chat)
+            rewriteMessages();
+
+        reloadChats();
     }
 
     public static class PrivateChatData {
