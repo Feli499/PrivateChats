@@ -5,8 +5,9 @@ Group {
 
     Button #OpenChatButton {
         LayoutMode: Top;
+        Anchor: (Top: 0, Bottom: 0);
         Background: $C.@InputBoxBackground;
-        Padding: (Left:10);
+        Padding: (Full: 10);
         Style:  ButtonStyle(
             Sounds: $C.@ButtonSounds,
         );
@@ -16,8 +17,10 @@ Group {
             Style: (
                 FontSize: 16,
                 RenderBold: true,
-                TextColor: #93844c
+                TextColor: #93844c,
+                VerticalAlignment: Center
             );
+            FlexWeight: 1;
 
             Text: "Name";
         }
@@ -26,9 +29,10 @@ Group {
             Style: (
                 FontSize: 12,
                 RenderBold: false,
-                TextColor: #808080
+                TextColor: #808080,
+                VerticalAlignment: Center
             );
-
+            FlexWeight: 1;
             Text: "Preview";
         }
     }

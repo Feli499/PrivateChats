@@ -43,9 +43,8 @@ $C.@Container {
             FlexWeight: 1;
 
             Group {
-                Anchor: (Width: 200);
+                Anchor: (Width: 300);
                 LayoutMode: Top;
-
 
                 Button {
                     LayoutMode: Top;
@@ -67,6 +66,7 @@ $C.@Container {
                 Group #ChatPreviewList {
                     LayoutMode: TopScrolling;
                     ScrollbarStyle: $C.@DefaultScrollbarStyle;
+                    Padding: (Full: 0);
 
                     Group #ChatPreviewItem {
                         LayoutMode: Top;
