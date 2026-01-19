@@ -4,7 +4,7 @@ Group {
     FlexWeight: 1;
     LayoutMode: Top;
 
-    Button #OpenChatButton {
+    Button {
         LayoutMode: Top;
         Anchor: (Height: 30);
         Background: $C.@InputBoxBackground;
@@ -13,7 +13,7 @@ Group {
             FlexWeight: 1;
             Text: "Label #ChatName";
             Style: (
-                FontSize: 24,
+                FontSize: 22,
                 TextColor: #96a9be,
                 HorizontalAlignment: Center,
                 RenderBold: true

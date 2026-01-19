@@ -46,8 +46,22 @@ $C.@Container {
                 Anchor: (Width: 200);
                 LayoutMode: Top;
 
-                Label {
-                    Text: "Deine Chats";
+
+                Button {
+                    LayoutMode: Top;
+                    Anchor: (Height: 30);
+                    Background: $C.@InputBoxBackground;
+
+                    Label {
+                        FlexWeight: 1;
+                        Text: "Your Chats";
+                        Style: (
+                            FontSize: 22,
+                            TextColor: #96a9be,
+                            HorizontalAlignment: Center,
+                            RenderBold: true
+                        );
+                    }
                 }
 
                 Group #ChatPreviewList {
