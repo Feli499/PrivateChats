@@ -2,8 +2,6 @@ $C = "../Common.ui";
 
 Button {
     LayoutMode: Left;
-    OutlineColor: #f87c5a(0.7);
-    OutlineSize: 1.5;
 
     Label #DisplayName {
         Text: "Label #DisplayName";

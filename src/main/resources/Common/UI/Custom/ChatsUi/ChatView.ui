@@ -3,11 +3,26 @@ $C = "../Common.ui";
 Group {
     FlexWeight: 1;
     LayoutMode: Top;
-    OutlineColor: #08ec1a(0.5);
-    OutlineSize: 1.5;
 
     Label #ChatName{
         Text: "Label #ChatName";
+    }
+
+    Group {
+        Anchor: (Height: 50);
+        LayoutMode: Left;
+
+        TextField #NewMessage {
+            Style: $C.@DefaultInputFieldStyle;
+            Background: $C.@InputBoxBackground;
+            FlexWeight: 1;
+            PlaceholderText: "Write a message...";
+        }
+
+        $C.@TextButton #SendMessageButton {
+            Anchor: (Width: 100, Right: 0);
+            Text: "Send";
+        }
     }
 
     Group {
@@ -18,23 +33,6 @@ Group {
 
         Group #MessageItem {
             LayoutMode: Top;
-        }
-    }
-
-    Group {
-        Anchor: (Bottom: 0, Height: 50);
-        LayoutMode: Left;
-
-        TextField #NewMessage {
-              Style: $C.@DefaultInputFieldStyle;
-              Background: $C.@InputBoxBackground;
-              FlexWeight: 1;
-              PlaceholderText: "Search...";
-        }
-
-        $C.@TextButton #SendMessageButton {
-            Anchor: (Width: 100, Right: 0);
-            Text: "Send";
         }
     }
 }
