@@ -36,18 +36,6 @@ $C.@Container {
                     Text: "Create Chat";
                 }
             }
-
-            Button #CreateGroup {
-                Background: $C.@InputBoxBackground;
-                Style:  ButtonStyle(
-                    Sounds: $C.@ButtonSounds,
-                );
-                Anchor: (Left:10);
-
-                Label {
-                    Text: "Create Group";
-                }
-            }
         }
 
         Group #Content {

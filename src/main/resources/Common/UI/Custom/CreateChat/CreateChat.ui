@@ -1,0 +1,53 @@
+$C = "../Common.ui";
+
+$C.@PageOverlay {}
+
+$C.@Container {
+  Anchor: (Width: 600, Height: 900);
+
+  #Title {
+
+    Group {
+      Background: "../icon.png";
+      Anchor: (Left: 10, Height:25, Width:25);
+    }
+
+    $C.@Title {
+      @Text = "Create Chat";
+    }
+  }
+
+  Group {
+    LayoutMode: Top;
+    FlexWeight: 1;
+    Anchor: (Top: 36);
+
+    Label {
+      Text: "Create a chat by selecting a player from belows list.";
+    }
+
+    TextField #SearchPlayerName {
+      Style: $C.@DefaultInputFieldStyle;
+      Background: $C.@InputBoxBackground;
+      PlaceholderText: "Player Name";
+    }
+
+
+    Group {
+      FlexWeight: 1;
+      LayoutMode: TopScrolling;
+      ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+      Group #PlayerItems {
+        LayoutMode: Top;
+      }
+    }
+
+    $C.@TextButton #CreateChatButton {
+      Anchor: (Width: 600);
+      Text: "Create";
+    }
+  }
+}
+
+$C.@BackButton {}

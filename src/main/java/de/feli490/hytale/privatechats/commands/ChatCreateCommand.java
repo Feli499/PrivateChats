@@ -8,25 +8,23 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.feli490.hytale.privatechats.PrivateChatManager;
-import de.feli490.hytale.privatechats.gui.PrivateChatsUI;
+import de.feli490.hytale.privatechats.gui.CreateChatUI;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import de.feli490.utils.hytale.utils.CommandUtils;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class ChatCommand extends AbstractAsyncCommand {
+public class ChatCreateCommand extends AbstractAsyncCommand {
     private final PrivateChatManager chatManager;
     private final PlayerDataProvider playerDataProvider;
 
-    public ChatCommand(PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
-        super("chat", "Opens the chat menu");
+    public ChatCreateCommand(PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
+        super("create", "Creates a new chat");
 
         this.chatManager = chatManager;
         this.playerDataProvider = playerDataProvider;
 
-        addSubCommand(new ChatCreateCommand(chatManager, playerDataProvider));
-
-        requirePermission("privatechats.chat");
+        requirePermission("privatechats.chat.create");
     }
 
     @NonNullDecl
@@ -44,13 +42,13 @@ public class ChatCommand extends AbstractAsyncCommand {
 
                                Ref<EntityStore> reference = playerRef.getReference();
 
-                               PrivateChatsUI privateChatsUI = new PrivateChatsUI(playerRef,
-                                                                                  CustomPageLifetime.CanDismiss,
-                                                                                  chatManager,
-                                                                                  playerDataProvider);
+                               CreateChatUI createChatUI = new CreateChatUI(playerRef,
+                                                                            CustomPageLifetime.CanDismiss,
+                                                                            chatManager,
+                                                                            playerDataProvider);
 
                                player.getPageManager()
-                                     .openCustomPage(reference, reference.getStore(), privateChatsUI);
+                                     .openCustomPage(reference, reference.getStore(), createChatUI);
                            });
     }
 }
