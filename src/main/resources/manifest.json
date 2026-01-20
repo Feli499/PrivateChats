@@ -1,7 +1,7 @@
 {
   "Group": "Feli490.de",
-  "Name": "HyFeChats",
-  "Version": "1.0.0",
+  "Name": "${artifact.artifactId}",
+  "Version": "${artifact.version}",
   "Description": "",
   "Authors": [
     {
