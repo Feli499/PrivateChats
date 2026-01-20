@@ -16,8 +16,6 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.feli490.hytale.hyfechats.PrivateChatManager;
-import de.feli490.hytale.hyfechats.chat.Chat;
-import de.feli490.hytale.hyfechats.chat.ChatRole;
 import de.feli490.utils.core.common.tuple.Pair;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import de.feli490.utils.hytale.utils.PlayerUtils;
@@ -176,8 +174,7 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
         if (selectedPlayerUUIDs.size() == 1) {
             chatManager.createDirectChat(playerRef.getUuid(), selectedPlayerUUIDs.get(0));
         } else if (selectedPlayerUUIDs.size() > 1) {
-            Chat groupChat = chatManager.createGroupChat(playerRef.getUuid());
-            selectedPlayerUUIDs.forEach(uuid -> groupChat.addChatter(uuid, ChatRole.MEMBER));
+            chatManager.createGroupChat(playerRef.getUuid(), selectedPlayerUUIDs);
         }
 
         goToPreviousPage();

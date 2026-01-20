@@ -24,7 +24,7 @@ public class ChatCreateCommand extends AbstractAsyncCommand {
         this.chatManager = chatManager;
         this.playerDataProvider = playerDataProvider;
 
-        requirePermission("cyfechats.chat.create");
+        requirePermission("hyfechats.chat.create");
     }
 
     @NonNullDecl

@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 public class PrivateChatManager {
 
@@ -61,8 +62,21 @@ public class PrivateChatManager {
                     .orElse(null);
     }
 
-    public Chat createGroupChat(UUID owner) {
+    public Chat createGroupChat(UUID owner, List<UUID> memberUUIDs) {
+
+        Stream<Chat> chatStream = chats.stream()
+                                       .filter(chat -> chat.isMember(owner))
+                                       .filter(chat -> chat.getChatType() == ChatType.GROUP)
+                                       .filter(chat -> chat.getMembers()
+                                                           .size() == memberUUIDs.size() + 1) //Add the owner
+                                       .filter(chat -> memberUUIDs.stream()
+                                                                  .allMatch(chat::isMember));
+        Optional<Chat> chat = chatStream.findFirst();
+        if (chat.isPresent())
+            return chat.get();
+
         Chat group = chatFactory.createGroup(owner);
+        memberUUIDs.forEach(uuid -> group.addChatter(uuid, ChatRole.MEMBER));
 
         chats.add(group);
         saveChat(group);
@@ -88,7 +102,8 @@ public class PrivateChatManager {
     public List<Chat> getSortedChats(UUID playerId) {
         return chats.stream()
                     .filter(chat -> chat.isMember(playerId))
-                    .sorted(Comparator.comparingLong(Chat::getLastUpdate))
+                    .sorted(Comparator.comparingLong(Chat::getLastUpdate)
+                                      .reversed())
                     .toList();
     }
 
