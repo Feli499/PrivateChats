@@ -124,7 +124,7 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
             uiCommandBuilder.set("#PlayerItems[" + row + "][" + column + "] #PlayerName.Text", pair.getSecond());
 
             ++column;
-            if (column >= 3) {
+            if (column >= 2) {
                 column = 0;
                 ++row;
             }
