@@ -6,21 +6,22 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
 import de.feli490.hytale.hyfechats.PrivateChatManager;
 import de.feli490.hytale.hyfechats.chat.Chat;
+import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import de.feli490.utils.hytale.utils.CommandUtils;
-import de.feli490.utils.hytale.utils.MessageUtils;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class MsgCommand extends AbstractAsyncCommand {
 
+    private final MessageBuilderFactory messageBuilderFactory;
     private final PrivateChatManager chatManager;
     private final PlayerDataProvider playerDataProvider;
 
     private final RequiredArg<String> playerArgument;
 
-    public MsgCommand(PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
+    public MsgCommand(MessageBuilderFactory messageBuilderFactory, PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
         super("msg", "Sends a private message to a player");
 
         this.chatManager = chatManager;
@@ -31,6 +32,8 @@ public class MsgCommand extends AbstractAsyncCommand {
 
         setAllowsExtraArguments(true);
         requirePermission("hyfechats.chat");
+
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     @NonNullDecl
@@ -46,7 +49,7 @@ public class MsgCommand extends AbstractAsyncCommand {
         }
 
         if (playerUUID == null) {
-            commandContext.sendMessage(MessageUtils.error("Unknown player: " + playerString));
+            messageBuilderFactory.sendError(commandContext, "Unknown player: " + playerString);
             return CompletableFuture.completedFuture(null);
         }
 
@@ -54,7 +57,7 @@ public class MsgCommand extends AbstractAsyncCommand {
                                               .trim()
                                               .split(" ", 3);
         if (splitMessage.length < 3) {
-            commandContext.sendMessage(MessageUtils.error("Please enter a message!"));
+            messageBuilderFactory.sendError(commandContext, "Please enter a message!");
             return CompletableFuture.completedFuture(null);
         }
 
@@ -66,7 +69,7 @@ public class MsgCommand extends AbstractAsyncCommand {
 
                                UUID senderUUID = playerRef.getUuid();
                                if (senderUUID.equals(receiverUUID)) {
-                                   commandContext.sendMessage(MessageUtils.error("You can't message yourself!"));
+                                   messageBuilderFactory.sendError(commandContext, "You can't message yourself!");
                                    return;
                                }
 

@@ -4,16 +4,17 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
 import de.feli490.hytale.hyfechats.PrivateChatManager;
 import de.feli490.hytale.hyfechats.chat.Chat;
+import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.utils.CommandUtils;
-import de.feli490.utils.hytale.utils.MessageUtils;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class ResponseCommand extends AbstractAsyncCommand {
 
+    private final MessageBuilderFactory messageBuilderFactory;
     private final PrivateChatManager chatManager;
 
-    public ResponseCommand(PrivateChatManager chatManager) {
+    public ResponseCommand(MessageBuilderFactory messageBuilderFactory, PrivateChatManager chatManager) {
         super("response", "Responds into the last private chat you got a message from");
 
         this.chatManager = chatManager;
@@ -22,6 +23,8 @@ public class ResponseCommand extends AbstractAsyncCommand {
         setAllowsExtraArguments(true);
 
         requirePermission("hyfechats.chat");
+
+        this.messageBuilderFactory = messageBuilderFactory;
     }
 
     @NonNullDecl
@@ -32,7 +35,7 @@ public class ResponseCommand extends AbstractAsyncCommand {
                                               .trim()
                                               .split(" ", 2);
         if (splitMessage.length < 2) {
-            commandContext.sendMessage(MessageUtils.error("Please enter a message!"));
+            messageBuilderFactory.sendError(commandContext, "Please enter a message!");
             return CompletableFuture.completedFuture(null);
         }
 
@@ -43,7 +46,7 @@ public class ResponseCommand extends AbstractAsyncCommand {
 
                                Chat lastChat = chatManager.getLastChat(playerRef.getUuid());
                                if (lastChat == null) {
-                                   commandContext.sendMessage(MessageUtils.error("No chat to respond to!"));
+                                   messageBuilderFactory.sendError(playerRef, "No chat to respond to!");
                                    return;
                                }
 

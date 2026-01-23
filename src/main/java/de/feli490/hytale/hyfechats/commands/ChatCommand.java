@@ -9,24 +9,27 @@ import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.feli490.hytale.hyfechats.PrivateChatManager;
 import de.feli490.hytale.hyfechats.gui.PrivateChatsUI;
+import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import de.feli490.utils.hytale.utils.CommandUtils;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class ChatCommand extends AbstractAsyncCommand {
+
+    private final MessageBuilderFactory messageBuilderFactory;
     private final PrivateChatManager chatManager;
     private final PlayerDataProvider playerDataProvider;
 
-    public ChatCommand(PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
+    public ChatCommand(MessageBuilderFactory messageBuilderFactory, PrivateChatManager chatManager, PlayerDataProvider playerDataProvider) {
         super("chat", "Opens the chat menu");
-
-        this.chatManager = chatManager;
-        this.playerDataProvider = playerDataProvider;
-
         addSubCommand(new ChatCreateCommand(chatManager, playerDataProvider));
 
         requirePermission("hyfechats.chat");
+
+        this.messageBuilderFactory = messageBuilderFactory;
+        this.chatManager = chatManager;
+        this.playerDataProvider = playerDataProvider;
     }
 
     @NonNullDecl
@@ -46,6 +49,7 @@ public class ChatCommand extends AbstractAsyncCommand {
 
                                PrivateChatsUI privateChatsUI = new PrivateChatsUI(playerRef,
                                                                                   CustomPageLifetime.CanDismiss,
+                                                                                  messageBuilderFactory,
                                                                                   chatManager,
                                                                                   playerDataProvider);
 

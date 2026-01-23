@@ -17,9 +17,10 @@ import de.feli490.hytale.hyfechats.PrivateChatManager;
 import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
+import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
-import de.feli490.utils.hytale.utils.MessageUtils;
 import de.feli490.utils.hytale.utils.PlayerUtils;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,13 +31,16 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.PrivateChatData> implements ReceivedNewMessageListener {
 
     private List<Chat> chats;
+    private final MessageBuilderFactory messageBuilderFactory;
     private final PlayerDataProvider playerDataProvider;
     private final PrivateChatManager chatManager;
     private Chat currentChat;
 
-    public PrivateChatsUI(@NonNullDecl PlayerRef playerRef, @NonNullDecl CustomPageLifetime lifetime, PrivateChatManager chatManager,
+    public PrivateChatsUI(@NonNullDecl PlayerRef playerRef, @NonNullDecl CustomPageLifetime lifetime,
+            MessageBuilderFactory messageBuilderFactory, PrivateChatManager chatManager,
             PlayerDataProvider playerDataProvider) {
         super(playerRef, lifetime, PrivateChatData.CODEC);
+        this.messageBuilderFactory = messageBuilderFactory;
         this.playerDataProvider = playerDataProvider;
         this.chatManager = chatManager;
         this.chats = Collections.emptyList();
@@ -116,7 +120,8 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
 
             uiCommandBuilder.set(selector + "[" + i + "] #DisplayName.Text", lastPlayerName + ": ");
             uiCommandBuilder.set(selector + "[" + i + "] #Message.Text", chatMessage.message());
-            uiCommandBuilder.set(selector + "[" + i + "].TooltipTextSpans", MessageUtils.formatTimestamp(chatMessage.timestamp()));
+            uiCommandBuilder.set(selector + "[" + i + "].TooltipTextSpans",
+                                 messageBuilderFactory.timestamp(chatMessage.timestamp(), Color.WHITE));
         }
 
         sendUpdate(uiCommandBuilder, false);
@@ -145,7 +150,11 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
                                                  lifetime,
                                                  chatManager,
                                                  playerDataProvider,
-                                                 () -> new PrivateChatsUI(playerRef, lifetime, chatManager, playerDataProvider));
+                                                 () -> new PrivateChatsUI(playerRef,
+                                                                          lifetime,
+                                                                          messageBuilderFactory,
+                                                                          chatManager,
+                                                                          playerDataProvider));
             PlayerUtils.getPlayer(playerRef)
                        .getPageManager()
                        .openCustomPage(ref, store, page);

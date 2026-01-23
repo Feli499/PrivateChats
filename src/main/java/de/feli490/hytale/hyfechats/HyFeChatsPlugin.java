@@ -11,6 +11,7 @@ import de.feli490.hytale.hyfechats.data.ChatDataLoader;
 import de.feli490.hytale.hyfechats.data.JsonChatDataLoader;
 import de.feli490.hytale.hyfechats.data.MemoryChatDataLoader;
 import de.feli490.utils.hytale.PlayerDataProviderInstance;
+import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ public class HyFeChatsPlugin extends JavaPlugin {
 
     private PrivateChatManager privateChatManager;
     private PlayerDataProvider playerDataProvider;
+    private MessageBuilderFactory messageBuilderFactory;
 
     public HyFeChatsPlugin(@NonNullDecl JavaPluginInit init) {
         super(init);
@@ -30,6 +32,7 @@ public class HyFeChatsPlugin extends JavaPlugin {
     @Override
     protected void setup() {
 
+        messageBuilderFactory = new MessageBuilderFactory("#1492ff", "#ffffff");
         try {
             createDataFolder();
         } catch (IOException e) {
@@ -51,7 +54,7 @@ public class HyFeChatsPlugin extends JavaPlugin {
 
         playerDataProvider = PlayerDataProviderInstance.get();
         ChatFactory chatFactory = new ChatFactory(playerDataProvider);
-        chatFactory.addMessageListenerForCreation(new SendMessagesToChatReceivedNewMessageListener(playerDataProvider));
+        chatFactory.addMessageListenerForCreation(new SendMessagesToChatReceivedNewMessageListener(messageBuilderFactory));
         
         privateChatManager = new PrivateChatManager(getLogger(), chatFactory, chatDataLoader);
 
@@ -81,8 +84,8 @@ public class HyFeChatsPlugin extends JavaPlugin {
 
     private void setupCommands() {
         CommandManager commandManager = CommandManager.get();
-        commandManager.registerSystemCommand(new ChatCommand(privateChatManager, playerDataProvider));
-        commandManager.registerSystemCommand(new ResponseCommand(privateChatManager));
-        commandManager.registerSystemCommand(new MsgCommand(privateChatManager, playerDataProvider));
+        commandManager.registerSystemCommand(new ChatCommand(messageBuilderFactory, privateChatManager, playerDataProvider));
+        commandManager.registerSystemCommand(new ResponseCommand(messageBuilderFactory, privateChatManager));
+        commandManager.registerSystemCommand(new MsgCommand(messageBuilderFactory, privateChatManager, playerDataProvider));
     }
 }
