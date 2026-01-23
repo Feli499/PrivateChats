@@ -10,9 +10,7 @@ Group {
     Style: ButtonStyle(
       Sounds: $C.@ButtonSounds,
     );
-    Background: #424a5e;
-    OutlineColor: #263047;
-    OutlineSize: 2;
+    Background: #263047(0.4);
 
 
     Label #ChatName {

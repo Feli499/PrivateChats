@@ -9,8 +9,9 @@ Group {
     Padding: (Full: 10);
     Style: ButtonStyle(
       Sounds: $C.@ButtonSounds,
+      Default: (Background: #263047),
+      Hovered: (Background: #263047(0.8))
     );
-    Background: #263047;
     OutlineColor: #93844c;
     OutlineSize: 2;
 

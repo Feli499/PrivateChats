@@ -7,10 +7,11 @@ Group {
         LayoutMode: Top;
         Anchor: (Top: 0, Bottom: 0);
         Padding: (Full: 10);
-        Style:  ButtonStyle(
+        Style: ButtonStyle(
             Sounds: $C.@ButtonSounds,
+            Default: (Background: #263047),
+            Hovered: (Background: #263047(0.8))
         );
-        Background: #263047;
         OutlineColor: #424a5e;
         OutlineSize: 2;
 
