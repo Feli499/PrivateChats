@@ -6,11 +6,13 @@ Group {
     Button #OpenChatButton {
         LayoutMode: Top;
         Anchor: (Top: 0, Bottom: 0);
-        Background: $C.@InputBoxBackground;
         Padding: (Full: 10);
         Style:  ButtonStyle(
             Sounds: $C.@ButtonSounds,
         );
+        Background: #263047;
+        OutlineColor: #424a5e;
+        OutlineSize: 2;
 
 
         Label #ChatName {

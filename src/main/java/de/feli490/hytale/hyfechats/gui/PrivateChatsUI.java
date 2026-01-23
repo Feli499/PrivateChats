@@ -188,7 +188,9 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
             if (lastMessage != null)
                 previewText = lastMessage.message();
 
-            uiCommandBuilder.append("#ChatPreviewItem", "ChatsUi/ChatListItem.ui");
+            String uiBase = chat.hasUnreadMessages(playerRef.getUuid()) ? "UnreadChatListItem" : "ChatListItem";
+
+            uiCommandBuilder.append("#ChatPreviewItem", "ChatsUi/" + uiBase + ".ui");
             uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #ChatName.Text", chat.getChatName(playerRef.getUuid()));
             uiCommandBuilder.set("#ChatPreviewItem[" + i + "] #MessagePreview.Text", previewText);
             uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating,
