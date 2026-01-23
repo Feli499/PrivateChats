@@ -176,7 +176,7 @@ public class Chat {
 
         Chat chat = new Chat(chatData.getId(), chatData.getChatType(), chatData.getCreated(), playerDataProvider);
         chat.messages.addAll(chatData.getMessages());
-        chat.playerChatProperties.addAll(chatData.getPlayerChatRoles());
+        chat.playerChatProperties.addAll(chatData.getPlayerChatProperties());
         return chat;
     }
 }

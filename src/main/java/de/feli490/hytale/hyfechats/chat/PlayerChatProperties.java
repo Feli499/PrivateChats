@@ -1,5 +1,6 @@
 package de.feli490.hytale.hyfechats.chat;
 
+import de.feli490.hytale.hyfechats.chat.playerchatproperties.DisplayUnreadProperty;
 import java.util.UUID;
 
 public class PlayerChatProperties {
@@ -8,17 +9,23 @@ public class PlayerChatProperties {
     private final long memberSince;
 
     private ChatRole role;
-    private long updated;
 
-    public PlayerChatProperties(UUID playerId, ChatRole role, long memberSince, long updated) {
+    private long lastRead;
+    private DisplayUnreadProperty displayUnreadProperty;
+
+    public PlayerChatProperties(UUID playerId, long memberSince, ChatRole role, long lastRead,
+            DisplayUnreadProperty displayUnreadProperty) {
         this.playerId = playerId;
-        this.role = role;
         this.memberSince = memberSince;
-        this.updated = updated;
+
+        this.role = role;
+
+        this.lastRead = lastRead;
+        this.displayUnreadProperty = displayUnreadProperty;
     }
 
     public PlayerChatProperties(UUID playerId, ChatRole role) {
-        this(playerId, role, System.currentTimeMillis(), System.currentTimeMillis());
+        this(playerId, System.currentTimeMillis(), role, System.currentTimeMillis(), DisplayUnreadProperty.ALWAYS);
     }
 
     public UUID getPlayerId() {
@@ -31,14 +38,25 @@ public class PlayerChatProperties {
 
     public void setRole(ChatRole role) {
         this.role = role;
-        this.updated = System.currentTimeMillis();
     }
 
     public long getMemberSince() {
         return memberSince;
     }
 
-    public long getUpdated() {
-        return updated;
+    public DisplayUnreadProperty getDisplayUnread() {
+        return displayUnreadProperty;
+    }
+
+    public void setDisplayUnread(DisplayUnreadProperty displayUnreadProperty) {
+        this.displayUnreadProperty = displayUnreadProperty;
+    }
+
+    public long getLastRead() {
+        return lastRead;
+    }
+
+    public void setLastRead(long lastRead) {
+        this.lastRead = lastRead;
     }
 }

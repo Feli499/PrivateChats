@@ -14,9 +14,7 @@ public interface ChatData {
 
     ChatType getChatType();
 
-    JsonChatDataLoader.JsonChatRoleData[] getJsonChatRoleData();
-
-    Set<PlayerChatProperties> getPlayerChatRoles();
+    Set<PlayerChatProperties> getPlayerChatProperties();
 
     List<ChatMessage> getMessages();
 }
