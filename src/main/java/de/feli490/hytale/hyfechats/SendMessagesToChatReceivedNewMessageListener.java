@@ -8,75 +8,67 @@ import de.feli490.hytale.hyfechats.chat.PlayerChatRole;
 import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.utils.hytale.message.MessageBuilder;
 import de.feli490.utils.hytale.message.MessageBuilderFactory;
+import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
 import java.util.UUID;
 
 public class SendMessagesToChatReceivedNewMessageListener implements ReceivedNewMessageListener {
 
     private final MessageBuilderFactory messageBuilderFactory;
+    private final PlayerDataProvider playerDataProvider;
 
-    public SendMessagesToChatReceivedNewMessageListener(MessageBuilderFactory messageBuilderFactory) {
+    public SendMessagesToChatReceivedNewMessageListener(MessageBuilderFactory messageBuilderFactory,
+            PlayerDataProvider playerDataProvider) {
         this.messageBuilderFactory = messageBuilderFactory;
+        this.playerDataProvider = playerDataProvider;
     }
 
     @Override
     public void onMessage(Chat chat, ChatMessage message) {
 
         UUID senderId = message.senderId();
-        switch (chat.getChatType()) {
+        Universe universe = Universe.get();
+
+        for (PlayerChatRole member : chat.getMembers()) {
+
+            UUID playerId = member.getPlayerId();
+            PlayerRef player = universe.getPlayer(playerId);
+            if (player == null)
+                continue;
+
+            MessageBuilder builder = messageBuilderFactory.builder();
+            switch (chat.getChatType()) {
             case DIRECT:
-                sendMessageForDirectChat(chat, message);
+                createDefaultPrefix(builder, chat, senderId, playerId);
                 break;
             case GROUP:
-                sendMessageForGroupChat(chat, message);
+                buildChatPrefixGroup(builder, chat, senderId, playerId);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown chat type: " + chat.getChatType());
-        }
-    }
-
-    private void sendMessageForDirectChat(Chat chat, ChatMessage chatMessage) {
-
-        UUID senderId = chatMessage.senderId();
-        for (PlayerChatRole member : chat.getMembers()) {
-            UUID playerId = member.getPlayerId();
-
-            PlayerRef player = Universe.get()
-                                       .getPlayer(playerId);
-            if (player == null)
-                continue;
-
-            MessageBuilder builder = messageBuilderFactory.builder()
-                                                          .main(playerId.equals(senderId) ? "[To " : "[From ")
-                                                          .main(chat.getChatName(playerId))
-                                                          .main("] ")
-                                                          .second(chatMessage.message());
-            player.sendMessage(builder.build());
-        }
-    }
-
-    private void sendMessageForGroupChat(Chat chat, ChatMessage chatMessage) {
-
-        UUID senderId = chatMessage.senderId();
-
-        for (PlayerChatRole member : chat.getMembers()) {
-            UUID playerId = member.getPlayerId();
-
-            PlayerRef player = Universe.get()
-                                       .getPlayer(playerId);
-            if (player == null)
-                continue;
-
-            String chatName = chat.getChatName(playerId);
-            if (chatName.length() > 10) {
-                chatName = chatName.substring(0, 10) + "...";
             }
 
-            MessageBuilder builder = messageBuilderFactory.builder()
-                                                          .main(playerId.equals(senderId) ? "[To " : "[From ")
-                                                          .main(chatName)
-                                                          .main("] ")
-                                                          .second(chatMessage.message());
+            builder.second(message.message());
             player.sendMessage(builder.build());
         }
+    }
+
+    private void buildChatPrefixGroup(MessageBuilder builder, Chat chat, UUID senderId, UUID playerId) {
+        createDefaultPrefix(builder, chat, senderId, playerId);
+        if (!playerId.equals(senderId)) {
+            builder.main(playerDataProvider.getLastPlayerName(senderId))
+                   .main(": ");
+        }
+    }
+
+    private void createDefaultPrefix(MessageBuilder builder, Chat chat, UUID senderId, UUID playerId) {
+
+        String chatName = chat.getChatName(playerId);
+        if (chatName.length() > 10) {
+            chatName = chatName.substring(0, 10) + "...";
+        }
+
+        builder.main(playerId.equals(senderId) ? "[To " : "[From ")
+               .main(chatName)
+               .main("] ");
     }
 }

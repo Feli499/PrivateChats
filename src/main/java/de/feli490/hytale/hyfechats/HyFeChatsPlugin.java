@@ -54,7 +54,8 @@ public class HyFeChatsPlugin extends JavaPlugin {
 
         playerDataProvider = PlayerDataProviderInstance.get();
         ChatFactory chatFactory = new ChatFactory(playerDataProvider);
-        chatFactory.addMessageListenerForCreation(new SendMessagesToChatReceivedNewMessageListener(messageBuilderFactory));
+        chatFactory.addMessageListenerForCreation(new SendMessagesToChatReceivedNewMessageListener(messageBuilderFactory,
+                                                                                                   playerDataProvider));
         
         privateChatManager = new PrivateChatManager(getLogger(), chatFactory, chatDataLoader);
 
