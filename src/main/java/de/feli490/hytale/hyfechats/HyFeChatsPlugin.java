@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.command.system.CommandManager;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import de.feli490.hytale.hyfechats.chat.ChatFactory;
+import de.feli490.hytale.hyfechats.chat.listeners.SendMessagesToChatReceivedNewMessageListener;
 import de.feli490.hytale.hyfechats.commands.ChatCommand;
 import de.feli490.hytale.hyfechats.commands.MsgCommand;
 import de.feli490.hytale.hyfechats.commands.ResponseCommand;

@@ -1,11 +1,10 @@
-package de.feli490.hytale.hyfechats;
+package de.feli490.hytale.hyfechats.chat.listeners;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
-import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.utils.hytale.message.MessageBuilder;
 import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
