@@ -7,7 +7,7 @@ Group {
     Button {
         LayoutMode: Top;
         Anchor: (Height: 30);
-        Background: $C.@InputBoxBackground;
+        Background: #203551;
 
         Label #ChatName {
             FlexWeight: 1;

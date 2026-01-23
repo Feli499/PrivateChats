@@ -44,7 +44,7 @@ $C.@Container {
                 Button {
                     LayoutMode: Top;
                     Anchor: (Height: 30);
-                    Background: $C.@InputBoxBackground;
+                    Background: #203551;
 
                     Label {
                         FlexWeight: 1;
