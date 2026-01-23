@@ -11,7 +11,7 @@ import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.ChatRole;
 import de.feli490.hytale.hyfechats.chat.ChatType;
-import de.feli490.hytale.hyfechats.chat.PlayerChatRole;
+import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -100,7 +100,7 @@ public class JsonChatDataLoader implements ChatDataLoader {
         private long created;
 
         private List<ChatMessage> messages;
-        private Set<PlayerChatRole> playerChatRoles;
+        private Set<PlayerChatProperties> playerChatProperties;
 
         public JsonChatData() {}
 
@@ -138,30 +138,30 @@ public class JsonChatDataLoader implements ChatDataLoader {
         @Override
         public JsonChatRoleData[] getJsonChatRoleData() {
 
-            JsonChatRoleData[] jsonChatRoleData = new JsonChatRoleData[playerChatRoles.size()];
+            JsonChatRoleData[] jsonChatRoleData = new JsonChatRoleData[playerChatProperties.size()];
             int i = 0;
-            for (PlayerChatRole playerChatRole : playerChatRoles) {
-                jsonChatRoleData[i++] = new JsonChatRoleData(playerChatRole);
+            for (PlayerChatProperties playerChatProperties : this.playerChatProperties) {
+                jsonChatRoleData[i++] = new JsonChatRoleData(playerChatProperties);
             }
             return jsonChatRoleData;
         }
 
         public void setJsonChatRoleData(JsonChatRoleData[] JsonChatRoleData) {
 
-            Set<PlayerChatRole> playerChatRoles = new HashSet<>(JsonChatRoleData.length);
+            Set<PlayerChatProperties> playerChatProperties = new HashSet<>(JsonChatRoleData.length);
             for (JsonChatRoleData jsonChatRoleData : JsonChatRoleData) {
-                playerChatRoles.add(jsonChatRoleData.toPlayerChatRole());
+                playerChatProperties.add(jsonChatRoleData.toPlayerChatRole());
             }
-            this.playerChatRoles = playerChatRoles;
+            this.playerChatProperties = playerChatProperties;
         }
 
         @Override
-        public Set<PlayerChatRole> getPlayerChatRoles() {
-            return playerChatRoles;
+        public Set<PlayerChatProperties> getPlayerChatRoles() {
+            return playerChatProperties;
         }
 
-        public void setPlayerChatRoles(Set<PlayerChatRole> playerChatRoles) {
-            this.playerChatRoles = Set.copyOf(playerChatRoles);
+        public void setPlayerChatRoles(Set<PlayerChatProperties> playerChatProperties) {
+            this.playerChatProperties = Set.copyOf(playerChatProperties);
         }
 
         public JsonMessageData[] getJsonMessageData() {
@@ -231,11 +231,11 @@ public class JsonChatDataLoader implements ChatDataLoader {
 
         public JsonChatRoleData() {}
 
-        public JsonChatRoleData(PlayerChatRole playerChatRole) {
-            this.playerId = playerChatRole.getPlayerId();
-            this.role = playerChatRole.getRole();
-            this.memberSince = playerChatRole.getMemberSince();
-            this.updated = playerChatRole.getUpdated();
+        public JsonChatRoleData(PlayerChatProperties playerChatProperties) {
+            this.playerId = playerChatProperties.getPlayerId();
+            this.role = playerChatProperties.getRole();
+            this.memberSince = playerChatProperties.getMemberSince();
+            this.updated = playerChatProperties.getUpdated();
         }
 
         public UUID getPlayerId() {
@@ -270,8 +270,8 @@ public class JsonChatDataLoader implements ChatDataLoader {
             this.memberSince = memberSince;
         }
 
-        public PlayerChatRole toPlayerChatRole() {
-            return new PlayerChatRole(playerId, role, memberSince, updated);
+        public PlayerChatProperties toPlayerChatRole() {
+            return new PlayerChatProperties(playerId, role, memberSince, updated);
         }
     }
 

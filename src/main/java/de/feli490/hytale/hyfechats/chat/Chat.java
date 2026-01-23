@@ -19,8 +19,8 @@ public class Chat {
     private final long created;
     private final PlayerDataProvider playerDataProvider;
 
-    private final Set<PlayerChatRole> playerChatRoles;
-    private final Set<PlayerChatRole> unmodifiablePlayerChatRoles;
+    private final Set<PlayerChatProperties> playerChatProperties;
+    private final Set<PlayerChatProperties> unmodifiablePlayerChatProperties;
 
     private final List<ChatMessage> messages;
     private final List<ChatMessage> unmodifiableMessageList;
@@ -34,10 +34,10 @@ public class Chat {
         this.created = created;
         this.playerDataProvider = playerDataProvider;
 
-        playerChatRoles = new HashSet<>();
+        playerChatProperties = new HashSet<>();
         messages = new ArrayList<>();
         unmodifiableMessageList = Collections.unmodifiableList(messages);
-        unmodifiablePlayerChatRoles = Collections.unmodifiableSet(playerChatRoles);
+        unmodifiablePlayerChatProperties = Collections.unmodifiableSet(playerChatProperties);
     }
 
     public void addNewMessageListener(ReceivedNewMessageListener listener) {
@@ -65,9 +65,9 @@ public class Chat {
     }
 
     public void addChatter(UUID playerId, ChatRole role) {
-        PlayerChatRole playerChatRole = new PlayerChatRole(playerId, role);
-        playerChatRoles.add(playerChatRole);
-        memberChangedListeners.forEach(listener -> listener.onMemberAdded(this, playerChatRole));
+        PlayerChatProperties playerChatProperties = new PlayerChatProperties(playerId, role);
+        this.playerChatProperties.add(playerChatProperties);
+        memberChangedListeners.forEach(listener -> listener.onMemberAdded(this, playerChatProperties));
     }
 
     public void sendMessage(UUID senderId, String message) {
@@ -80,28 +80,28 @@ public class Chat {
 
     public void removeChatter(UUID playerId) {
 
-        PlayerChatRole playerChatRole = getPlayerChatRole(playerId);
-        playerChatRoles.remove(playerChatRole);
-        memberChangedListeners.forEach(listener -> listener.onMemberRemoved(this, playerChatRole));
+        PlayerChatProperties playerChatProperties = getPlayerChatRole(playerId);
+        this.playerChatProperties.remove(playerChatProperties);
+        memberChangedListeners.forEach(listener -> listener.onMemberRemoved(this, playerChatProperties));
     }
 
-    private PlayerChatRole getPlayerChatRole(UUID playerId) {
-        return playerChatRoles.stream()
-                              .filter(playerChatRole -> playerChatRole.getPlayerId()
+    private PlayerChatProperties getPlayerChatRole(UUID playerId) {
+        return playerChatProperties.stream()
+                                   .filter(playerChatRole -> playerChatRole.getPlayerId()
                                                                       .equals(playerId))
-                              .findFirst()
-                              .orElse(null);
+                                   .findFirst()
+                                   .orElse(null);
     }
 
     public String getChatName(UUID chatNameFor) {
 
         if (chatType == ChatType.DIRECT) {
-            Optional<PlayerChatRole> first = playerChatRoles.stream()
-                                                            .filter(playerChatRole -> !playerChatRole.getPlayerId()
+            Optional<PlayerChatProperties> first = this.playerChatProperties.stream()
+                                                                            .filter(playerChatRole -> !playerChatRole.getPlayerId()
                                                                                                      .equals(chatNameFor))
-                                                            .findFirst();
-            PlayerChatRole playerChatRole = first.get();
-            UUID playerId = playerChatRole.getPlayerId();
+                                                                            .findFirst();
+            PlayerChatProperties playerChatProperties = first.get();
+            UUID playerId = playerChatProperties.getPlayerId();
             String lastPlayerName = playerDataProvider.getLastPlayerName(playerId);
             if (lastPlayerName == null)
                 return "Unknown (" + playerId + ")";
@@ -110,12 +110,12 @@ public class Chat {
 
         StringBuilder stringBuilder = new StringBuilder(chatType.name()
                                                                 .charAt(0) + ": ");
-        for (PlayerChatRole playerChatRole : playerChatRoles) {
-            if (playerChatRole.getPlayerId()
-                              .equals(chatNameFor))
+        for (PlayerChatProperties playerChatProperties : this.playerChatProperties) {
+            if (playerChatProperties.getPlayerId()
+                                    .equals(chatNameFor))
                 continue;
 
-            stringBuilder.append(playerDataProvider.getLastPlayerName(playerChatRole.getPlayerId()))
+            stringBuilder.append(playerDataProvider.getLastPlayerName(playerChatProperties.getPlayerId()))
                          .append(", ");
         }
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
@@ -123,16 +123,16 @@ public class Chat {
     }
 
     public ChatRole getRole(UUID playerId) {
-        return playerChatRoles.stream()
-                              .filter(playerChatRole -> playerChatRole.getPlayerId()
+        return playerChatProperties.stream()
+                                   .filter(playerChatRole -> playerChatRole.getPlayerId()
                                                                       .equals(playerId))
-                              .findFirst()
-                              .map(PlayerChatRole::getRole)
-                              .orElse(null);
+                                   .findFirst()
+                                   .map(PlayerChatProperties::getRole)
+                                   .orElse(null);
     }
 
-    public Set<PlayerChatRole> getMembers() {
-        return unmodifiablePlayerChatRoles;
+    public Set<PlayerChatProperties> getMembers() {
+        return unmodifiablePlayerChatProperties;
     }
 
     public long getCreated() {
@@ -159,8 +159,8 @@ public class Chat {
     }
 
     public boolean isMember(UUID uuid) {
-        return playerChatRoles.stream()
-                              .anyMatch(playerChatRole -> playerChatRole.getPlayerId()
+        return playerChatProperties.stream()
+                                   .anyMatch(playerChatRole -> playerChatRole.getPlayerId()
                                                                         .equals(uuid));
     }
 
@@ -176,7 +176,7 @@ public class Chat {
 
         Chat chat = new Chat(chatData.getId(), chatData.getChatType(), chatData.getCreated(), playerDataProvider);
         chat.messages.addAll(chatData.getMessages());
-        chat.playerChatRoles.addAll(chatData.getPlayerChatRoles());
+        chat.playerChatProperties.addAll(chatData.getPlayerChatRoles());
         return chat;
     }
 }

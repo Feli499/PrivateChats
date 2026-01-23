@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
-import de.feli490.hytale.hyfechats.chat.PlayerChatRole;
+import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.utils.hytale.message.MessageBuilder;
 import de.feli490.utils.hytale.message.MessageBuilderFactory;
@@ -28,7 +28,7 @@ public class SendMessagesToChatReceivedNewMessageListener implements ReceivedNew
         UUID senderId = message.senderId();
         Universe universe = Universe.get();
 
-        for (PlayerChatRole member : chat.getMembers()) {
+        for (PlayerChatProperties member : chat.getMembers()) {
 
             UUID playerId = member.getPlayerId();
             PlayerRef player = universe.getPlayer(playerId);

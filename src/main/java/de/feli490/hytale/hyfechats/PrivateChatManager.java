@@ -6,7 +6,7 @@ import de.feli490.hytale.hyfechats.chat.ChatFactory;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.ChatRole;
 import de.feli490.hytale.hyfechats.chat.ChatType;
-import de.feli490.hytale.hyfechats.chat.PlayerChatRole;
+import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import de.feli490.hytale.hyfechats.chat.listeners.MemberChangedListener;
 import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.hytale.hyfechats.data.ChatData;
@@ -126,17 +126,17 @@ public class PrivateChatManager {
         }
 
         @Override
-        public void onMemberAdded(Chat chat, PlayerChatRole member) {
+        public void onMemberAdded(Chat chat, PlayerChatProperties member) {
             privateChatManager.saveChat(chat);
         }
 
         @Override
-        public void onMemberRemoved(Chat chat, PlayerChatRole member) {
+        public void onMemberRemoved(Chat chat, PlayerChatProperties member) {
             privateChatManager.saveChat(chat);
         }
 
         @Override
-        public void onMemberRoleChanged(Chat chat, PlayerChatRole newRole, ChatRole oldRole) {
+        public void onMemberRoleChanged(Chat chat, PlayerChatProperties newRole, ChatRole oldRole) {
             privateChatManager.saveChat(chat);
         }
     }

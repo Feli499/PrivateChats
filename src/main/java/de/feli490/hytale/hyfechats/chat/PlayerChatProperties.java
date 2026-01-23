@@ -2,7 +2,7 @@ package de.feli490.hytale.hyfechats.chat;
 
 import java.util.UUID;
 
-public class PlayerChatRole {
+public class PlayerChatProperties {
 
     private final UUID playerId;
     private final long memberSince;
@@ -10,14 +10,14 @@ public class PlayerChatRole {
     private ChatRole role;
     private long updated;
 
-    public PlayerChatRole(UUID playerId, ChatRole role, long memberSince, long updated) {
+    public PlayerChatProperties(UUID playerId, ChatRole role, long memberSince, long updated) {
         this.playerId = playerId;
         this.role = role;
         this.memberSince = memberSince;
         this.updated = updated;
     }
 
-    public PlayerChatRole(UUID playerId, ChatRole role) {
+    public PlayerChatProperties(UUID playerId, ChatRole role) {
         this(playerId, role, System.currentTimeMillis(), System.currentTimeMillis());
     }
 
