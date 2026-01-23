@@ -5,7 +5,8 @@
 **HyFeChats** is an open-source Hytale plugin that adds private chat functionality for your server. It supports both
 direct messages and group chats, allowing players to communicate discreetly and efficiently.
 
-Join my Discord server for support and updates: https://discord.gg/6TgUkMJZw8
+[![Join Discord](https://img.shields.io/discord/1452733970507763793?style=for-the-badge&label=Join%20Discord)](https://discord.gg/6TgUkMJZw8)
+[![GitHub Release](https://img.shields.io/github/v/release/Feli499/HyFeChats?style=for-the-badge)](https://github.com/Feli499/HyFeChats/releases/latest)
 
 Sometimes i am live on twitch developing on plugins and stuff: https://twitch.tv/feli490
 
