@@ -1,0 +1,41 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Height: 50);
+
+  Button #OpenChatButton {
+    LayoutMode: Top;
+    Anchor: (Top: 0, Bottom: 0);
+    Padding: (Full: 10);
+    Style: ButtonStyle(
+      Sounds: $C.@ButtonSounds,
+    );
+    Background: #424a5e;
+    OutlineColor: #263047;
+    OutlineSize: 2;
+
+
+    Label #ChatName {
+      Style: (
+        FontSize: 16,
+        RenderBold: true,
+        TextColor: #93844c,
+        VerticalAlignment: Center
+      );
+      FlexWeight: 1;
+
+      Text: "Name";
+    }
+
+    Label #MessagePreview {
+      Style: (
+        FontSize: 12,
+        RenderBold: false,
+        TextColor: #808080,
+        VerticalAlignment: Center
+      );
+      FlexWeight: 1;
+      Text: "Preview";
+    }
+  }
+}
