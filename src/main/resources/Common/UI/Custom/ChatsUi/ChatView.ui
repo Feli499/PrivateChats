@@ -47,7 +47,7 @@ Group {
 
         Group #MessageItem {
             LayoutMode: Top;
-            Padding: (Left: 10, Right: 50);
+            Padding: (Left: 10, Top: 10, Right: 100);
         }
     }
 }
