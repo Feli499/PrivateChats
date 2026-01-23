@@ -96,6 +96,9 @@ public class PrivateChatsUI extends InteractiveCustomUIPage<PrivateChatsUI.Priva
         sendUpdate(uiCommandBuilder, uiEventBuilder, false);
 
         rewriteMessages();
+
+        chat.opensChat(playerRef.getUuid());
+        reloadChats();
     }
 
     public void rewriteMessages() {

@@ -1,6 +1,7 @@
 package de.feli490.hytale.hyfechats.chat;
 
 import de.feli490.hytale.hyfechats.chat.listeners.MemberChangedListener;
+import de.feli490.hytale.hyfechats.chat.listeners.PlayerOpensChatListener;
 import de.feli490.hytale.hyfechats.chat.listeners.ReceivedNewMessageListener;
 import de.feli490.hytale.hyfechats.data.ChatData;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
@@ -27,6 +28,7 @@ public class Chat {
 
     private final Set<ReceivedNewMessageListener> messageListeners = new HashSet<>();
     private final Set<MemberChangedListener> memberChangedListeners = new HashSet<>();
+    private final Set<PlayerOpensChatListener> playerOpensChatListeners = new HashSet<>();
 
     public Chat(UUID id, ChatType chatType, long created, PlayerDataProvider playerDataProvider) {
         this.id = id;
@@ -38,6 +40,28 @@ public class Chat {
         messages = new ArrayList<>();
         unmodifiableMessageList = Collections.unmodifiableList(messages);
         unmodifiablePlayerChatProperties = Collections.unmodifiableSet(playerChatProperties);
+    }
+
+    public boolean hasUnreadMessages(UUID playerId) {
+        PlayerChatProperties playerProperties = getPlayerChatProperties(playerId);
+        return playerProperties.getLastRead() < getLastMessage().timestamp();
+    }
+
+    public void opensChat(UUID playerId) {
+        getPlayerChatProperties(playerId).setLastRead(getLastMessage().timestamp());
+        playerOpensChatListeners.forEach(listener -> listener.onChatOpened(this, playerId));
+    }
+
+    public void addNewPlayerOpensChatListener(PlayerOpensChatListener listener) {
+        playerOpensChatListeners.add(listener);
+    }
+
+    public boolean isPlayerOpensChatListenerRegister(PlayerOpensChatListener listener) {
+        return playerOpensChatListeners.contains(listener);
+    }
+
+    public void removePlayerOpensChatListener(PlayerOpensChatListener listener) {
+        playerOpensChatListeners.remove(listener);
     }
 
     public void addNewMessageListener(ReceivedNewMessageListener listener) {
@@ -80,12 +104,12 @@ public class Chat {
 
     public void removeChatter(UUID playerId) {
 
-        PlayerChatProperties playerChatProperties = getPlayerChatRole(playerId);
+        PlayerChatProperties playerChatProperties = getPlayerChatProperties(playerId);
         this.playerChatProperties.remove(playerChatProperties);
         memberChangedListeners.forEach(listener -> listener.onMemberRemoved(this, playerChatProperties));
     }
 
-    private PlayerChatProperties getPlayerChatRole(UUID playerId) {
+    private PlayerChatProperties getPlayerChatProperties(UUID playerId) {
         return playerChatProperties.stream()
                                    .filter(playerChatRole -> playerChatRole.getPlayerId()
                                                                       .equals(playerId))
