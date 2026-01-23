@@ -73,17 +73,33 @@ $C.@Container {
                 FlexWeight: 1;
                 LayoutMode: Top;
 
-                Label #ChatLabel{
-                    Text: "No Chat selected";
+                Group {
                     FlexWeight: 1;
-                    Style: (
-                        FontSize: 18,
-                        TextColor: #96a9be,
-                        VerticalAlignment: Center,
-                        HorizontalAlignment: Center,
-                        RenderBold: true,
-                        Wrap: true
-                    );
+                    LayoutMode: Top;
+
+                    Button {
+                        LayoutMode: Top;
+                        Anchor: (Height: 30);
+                        Background: #203551;
+                    }
+
+                    Group {
+                        FlexWeight: 1;
+                        Background: #000000(0.2);
+
+                        Label #ChatLabel {
+                            Text: "No Chat selected";
+                            FlexWeight: 1;
+                            Style: (
+                                FontSize: 18,
+                                TextColor: #96a9be,
+                                VerticalAlignment: Center,
+                                HorizontalAlignment: Center,
+                                RenderBold: true,
+                                Wrap: true
+                            );
+                        }
+                    }
                 }
             }
         }
