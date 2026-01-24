@@ -32,13 +32,13 @@ Group {
             PlaceholderText: "Write a message...";
             PlaceholderStyle: (
                 FontSize: 18,
-                TextColor: #7888a1(0.4)
+                TextColor: #424a5e(0.6)
             );
             Style: (
                 FontSize: 18,
-                TextColor: #7888a1
+                TextColor: #424a5e
             );
-            OutlineColor: #7888a1;
+            OutlineColor: #424a5e;
             OutlineSize: 2;
         }
 
@@ -49,7 +49,7 @@ Group {
                 Hovered: (Background: #263047(0.8))
             );
             Background: #263047;
-            OutlineColor: #7888a1;
+            OutlineColor: #424a5e;
             OutlineSize: 2;
 
             Label {
