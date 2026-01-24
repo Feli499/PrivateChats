@@ -81,7 +81,7 @@ $C.@Container {
                 Group #ChatPreviewList {
                     LayoutMode: TopScrolling;
                     ScrollbarStyle: $C.@DefaultScrollbarStyle;
-                    Padding: (Full: 0, Top: 5);
+                    Padding: (Full: 0, Top: 3);
 
                     Group #ChatPreviewItem {
                         LayoutMode: Top;

@@ -24,7 +24,7 @@ Group {
     Group {
         Anchor: (Height: 50);
         LayoutMode: Left;
-        Padding: (Full: 0, Top: 6);
+        Padding: (Full: 0, Top: 4);
 
         TextField #NewMessage {
             Padding: (Left:5);
