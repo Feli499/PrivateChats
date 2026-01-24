@@ -3,6 +3,7 @@ $C = "../Common.ui";
 Group {
     FlexWeight: 1;
     LayoutMode: Top;
+    Background: #000000(0.2);
 
     Button {
         LayoutMode: Top;
@@ -25,7 +26,6 @@ Group {
         FlexWeight: 1;
         LayoutMode: BottomScrolling;
         ScrollbarStyle: $C.@DefaultScrollbarStyle;
-        Background: #000000(0.2);
         AutoScrollDown: true;
 
         Group #MessageItem {
