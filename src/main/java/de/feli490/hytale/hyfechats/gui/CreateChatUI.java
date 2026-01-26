@@ -114,8 +114,8 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
                 uiCommandBuilder.appendInline("#PlayerItems", "Group { LayoutMode: Left; Anchor: (Bottom: 0); }");
             }
 
-            uiCommandBuilder.append("#PlayerItems[" + row + "]", "CreateChat/PlayerListItem.ui");
-            uiCommandBuilder.set("#PlayerItems[" + row + "][" + column + "] #IsSelected.Value", selectedPlayerUUIDs.contains(currentUUID));
+            uiCommandBuilder.append("#PlayerItems[" + row + "]",
+                                    "CreateChat/" + (selectedPlayerUUIDs.contains(currentUUID) ? "Selected" : "") + "PlayerListItem.ui");
             uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating,
                                            "#PlayerItems[" + row + "][" + column + "] #PlayerListItemButton",
                                            EventData.of(CreateChatData.KEY_PLAYER_EDIT_UUID, currentUUID.toString()),
@@ -131,16 +131,18 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
         }
     }
 
-    public void updatePlayerList(String playerSearchQuery) {
-
-        this.playerSearchQuery = playerSearchQuery;
-
+    private void refreshPlayerList() {
         UICommandBuilder uiCommandBuilder = new UICommandBuilder();
         UIEventBuilder uiEventBuilder = new UIEventBuilder();
 
         updatePlayerList(uiCommandBuilder, uiEventBuilder);
 
         sendUpdate(uiCommandBuilder, uiEventBuilder, false);
+    }
+
+    public void updatePlayerList(String playerSearchQuery) {
+        this.playerSearchQuery = playerSearchQuery;
+        refreshPlayerList();
     }
 
     @Override
@@ -188,14 +190,7 @@ public class CreateChatUI extends InteractiveCustomUIPage<CreateChatUI.CreateCha
             selectedPlayerUUIDs.add(playerUUID);
         }
 
-        int index = currentDisplayedUUIDs.indexOf(playerUUID);
-        int row = index / 2;
-        int column = index % 2;
-
-        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
-        uiCommandBuilder.set("#PlayerItems[" + row + "][" + column + "] #IsSelected.Value", selectedPlayerUUIDs.contains(playerUUID));
-
-        sendUpdate(uiCommandBuilder, false);
+        refreshPlayerList();
     }
 
     public static class CreateChatData {

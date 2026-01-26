@@ -1,0 +1,30 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Height: 50, Width: 600/2);
+  Padding: (Bottom: 5, Right: 5);
+
+  Button #PlayerListItemButton {
+    LayoutMode: Left;
+    Padding: (Left:10);
+    Style: ButtonStyle(
+      Sounds: $C.@ButtonSounds,
+      Hovered: (Background: #4b5570(0.8))
+    );
+    Background: #4b5570;
+    OutlineColor: #59ae59;
+    OutlineSize: 2;
+
+    Label #PlayerName {
+      Anchor: (Right: 30, Left: 11);
+      Style: (
+        FontSize: 18,
+        TextColor: #ffffff,
+        VerticalAlignment: Center,
+        RenderBold: true
+      );
+
+      Text: "Label #PlayerName";
+    }
+  }
+}

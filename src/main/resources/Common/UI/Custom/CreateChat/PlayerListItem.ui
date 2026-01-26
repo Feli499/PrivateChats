@@ -6,15 +6,14 @@ Group {
 
     Button #PlayerListItemButton {
         LayoutMode: Left;
-        Background: $C.@InputBoxBackground;
         Padding: (Left:10);
         Style:  ButtonStyle(
             Sounds: $C.@ButtonSounds,
+            Hovered: (Background: #263047(0.8))
         );
-
-        $C.@CheckBox #IsSelected {
-            Value: false;
-        }
+        Background: #263047;
+        OutlineColor: #424a5e;
+        OutlineSize: 2;
 
         Label #PlayerName {
             Anchor: (Right: 30, Left: 11);
