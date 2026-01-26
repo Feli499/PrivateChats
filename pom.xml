@@ -6,7 +6,7 @@
 
     <groupId>de.feli490.hytale</groupId>
     <artifactId>HyFeChats</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
