@@ -59,7 +59,7 @@ public class Chat {
     }
 
     public void opensChat(UUID playerId) {
-        getPlayerChatProperties(playerId).setLastRead(getLastMessage().timestamp());
+        getPlayerChatProperties(playerId).setLastRead(getLastUpdate());
         playerOpensChatListeners.forEach(listener -> listener.onChatOpened(this, playerId));
     }
 
