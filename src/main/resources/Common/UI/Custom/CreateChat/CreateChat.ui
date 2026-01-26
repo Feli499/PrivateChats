@@ -33,13 +33,23 @@ $C.@Container {
         RenderBold: true
       );
       Anchor: (Right: 0, Left: 0);
+      Padding: (Top: 10, Bottom: 10);
     }
 
     TextField #SearchPlayerName {
-      Anchor: (Height: 30);
-      Style: $C.@DefaultInputFieldStyle;
-      Background: $C.@InputBoxBackground;
+      Anchor: (Height: 50);
       PlaceholderText: "Search for player...";
+      Padding: (Left:5);
+      PlaceholderStyle: (
+        FontSize: 14,
+        TextColor: #424a5e(0.6)
+      );
+      Style: (
+        FontSize: 14,
+        TextColor: #ffffff
+      );
+      OutlineColor: #424a5e;
+      OutlineSize: 2;
     }
 
 
@@ -54,9 +64,27 @@ $C.@Container {
       }
     }
 
-    $C.@TextButton #CreateChatButton {
-      Anchor: (Width: 600);
-      Text: "Create";
+    Button #CreateChatButton {
+      Anchor: (Height: 50, Right: 0);
+      Style: ButtonStyle(
+        Sounds: $C.@ButtonSounds,
+        Hovered: (Background: #263047(0.8))
+      );
+      Background: #263047;
+      OutlineColor: #424a5e;
+      OutlineSize: 2;
+
+      Label {
+        FlexWeight: 1;
+        Style: (
+          FontSize: 22,
+          TextColor: #96a9be,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center,
+          RenderBold: true
+        );
+        Text: "Create chat";
+      }
     }
   }
 }
