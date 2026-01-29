@@ -102,7 +102,7 @@ public class Chat {
     }
 
     public void addChatter(UUID playerId, ChatRole role) {
-        PlayerChatProperties playerChatProperties = new PlayerChatProperties(playerId, role);
+        PlayerChatProperties playerChatProperties = new PlayerChatProperties(this, playerId, role);
         this.playerChatProperties.add(playerChatProperties);
         memberChangedListeners.forEach(listener -> listener.onMemberAdded(this, playerChatProperties));
     }
@@ -113,7 +113,7 @@ public class Chat {
         if (message.isEmpty())
             return;
 
-        ChatMessage chatMessage = new ChatMessage(UUID.randomUUID(), senderId, message, System.currentTimeMillis());
+        ChatMessage chatMessage = new ChatMessage(this, UUID.randomUUID(), senderId, message, System.currentTimeMillis());
         messages.add(chatMessage);
         List.copyOf(messageListeners)
             .forEach(listener -> listener.onMessage(this, chatMessage));
@@ -216,8 +216,8 @@ public class Chat {
     public static Chat fromChatData(ChatData chatData, PlayerDataProvider playerDataProvider) {
 
         Chat chat = new Chat(chatData.getId(), chatData.getChatType(), chatData.getCreated(), playerDataProvider);
-        chat.messages.addAll(chatData.getMessages());
-        chat.playerChatProperties.addAll(chatData.getPlayerChatProperties());
+        chat.messages.addAll(chatData.getMessages(chat));
+        chat.playerChatProperties.addAll(chatData.getPlayerChatProperties(chat));
         return chat;
     }
 }

@@ -1,6 +1,7 @@
 package de.feli490.hytale.hyfechats.data;
 
 import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
@@ -18,11 +19,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.bson.BsonValue;
 
 public class JsonChatDataLoader implements ChatDataLoader {
 
@@ -39,6 +42,16 @@ public class JsonChatDataLoader implements ChatDataLoader {
 
         if (!Files.isDirectory(path))
             throw new IllegalArgumentException("Path must be a directory");
+
+    }
+
+    @Override
+    public void saveMessage(ChatMessage message) throws IOException {
+
+    }
+
+    @Override
+    public void savePlayerChatProperties(ChatMessage message) throws IOException {
 
     }
 
@@ -70,6 +83,7 @@ public class JsonChatDataLoader implements ChatDataLoader {
     }
 
     private void saveChat(JsonChatData jsonChatData) throws IOException {
+        BsonValue encode = JsonChatData.CODEC.encode(jsonChatData, EmptyExtraInfo.EMPTY);
         BsonUtil.writeSync(directory.resolve(jsonChatData.getId()
                                                          .toString() + ".json"), JsonChatData.CODEC, jsonChatData, logger);
     }
@@ -111,9 +125,9 @@ public class JsonChatDataLoader implements ChatDataLoader {
         private ChatType chatType;
         private long created;
 
-        private List<ChatMessage> messages;
+        private List<JsonMessageData> messages;
         private boolean needsToBeResaved = false;
-        private Set<PlayerChatProperties> playerChatProperties = new HashSet<>();
+        private Set<JsonPlayerChatProperties> playerChatProperties = new HashSet<>();
 
         public JsonChatData() {}
 
@@ -157,68 +171,60 @@ public class JsonChatDataLoader implements ChatDataLoader {
             if (jsonPlayerChatPropertiesArray == null || jsonPlayerChatPropertiesArray.length == 0)
                 return;
 
-            Set<PlayerChatProperties> playerChatProperties = new HashSet<>(jsonPlayerChatPropertiesArray.length);
-            for (JsonPlayerChatProperties jsonPlayerChatProperties : jsonPlayerChatPropertiesArray) {
-                playerChatProperties.add(jsonPlayerChatProperties.toPlayerChatProperties());
-            }
-            this.playerChatProperties.addAll(playerChatProperties);
+            this.playerChatProperties.addAll(List.of(jsonPlayerChatPropertiesArray));
             needsToBeResaved = true;
         }
 
         public JsonPlayerChatProperties[] getJsonPlayerChatProperties() {
-
-            JsonPlayerChatProperties[] jsonPlayerChatRoleData = new JsonPlayerChatProperties[playerChatProperties.size()];
-            int i = 0;
-            for (PlayerChatProperties playerChatProperties : this.playerChatProperties) {
-                jsonPlayerChatRoleData[i++] = new JsonPlayerChatProperties(playerChatProperties);
-            }
-            return jsonPlayerChatRoleData;
+            return this.playerChatProperties.toArray(new JsonPlayerChatProperties[0]);
         }
 
         public void setJsonPlayerChatProperties(JsonPlayerChatProperties[] JsonPlayerChatProperties) {
-
-            Set<PlayerChatProperties> playerChatProperties = new HashSet<>(JsonPlayerChatProperties.length);
-            for (JsonPlayerChatProperties jsonPlayerChatProperties : JsonPlayerChatProperties) {
-                playerChatProperties.add(jsonPlayerChatProperties.toPlayerChatProperties());
-            }
-            this.playerChatProperties.addAll(playerChatProperties);
+            this.playerChatProperties.addAll(List.of(JsonPlayerChatProperties));
         }
 
         @Override
-        public Set<PlayerChatProperties> getPlayerChatProperties() {
+        public Set<PlayerChatProperties> getPlayerChatProperties(Chat chat) {
+
+            Set<PlayerChatProperties> playerChatProperties = new HashSet<>();
+            for (JsonPlayerChatProperties jsonPlayerChatProperties : getJsonPlayerChatProperties()) {
+                playerChatProperties.add(jsonPlayerChatProperties.toPlayerChatProperties(chat));
+            }
             return playerChatProperties;
         }
 
         public void setPlayerChatProperties(Set<PlayerChatProperties> playerChatProperties) {
-            this.playerChatProperties = new HashSet<>(playerChatProperties);
+            this.playerChatProperties = new HashSet<>(playerChatProperties.size());
+            for (PlayerChatProperties playerChatProperty : playerChatProperties) {
+                this.playerChatProperties.add(new JsonPlayerChatProperties(playerChatProperty));
+            }
         }
 
         public JsonMessageData[] getJsonMessageData() {
-
-            JsonMessageData[] jsonMessageData = new JsonMessageData[messages.size()];
-            for (int i = 0; i < messages.size(); i++) {
-                ChatMessage message = messages.get(i);
-                jsonMessageData[i] = new JsonMessageData(message);
-            }
-            return jsonMessageData;
+            return messages.toArray(new JsonMessageData[0]);
         }
 
         public void setJsonMessageData(JsonMessageData[] messages) {
-
-            ArrayList<ChatMessage> messagesList = new ArrayList<>(messages.length);
-            for (JsonMessageData message : messages) {
-                messagesList.add(message.toChatMessage());
-            }
-            this.messages = messagesList;
+            this.messages = Arrays.stream(messages)
+                                  .toList();
         }
 
         @Override
-        public List<ChatMessage> getMessages() {
-            return messages;
+        public List<ChatMessage> getMessages(Chat chat) {
+
+            ArrayList<ChatMessage> chatMessages = new ArrayList<>(messages.size());
+            for (JsonMessageData message : messages) {
+                chatMessages.add(message.toChatMessage(chat));
+            }
+            return chatMessages;
         }
 
         public void setMessages(List<ChatMessage> messages) {
-            this.messages = List.copyOf(messages);
+
+            this.messages = new ArrayList<>(messages.size());
+            for (ChatMessage message : messages) {
+                this.messages.add(new JsonMessageData(message));
+            }
         }
 
         public static JsonChatData fromChat(Chat chat) {
@@ -327,8 +333,8 @@ public class JsonChatDataLoader implements ChatDataLoader {
             this.lastRead = lastRead;
         }
 
-        public PlayerChatProperties toPlayerChatProperties() {
-            return new PlayerChatProperties(playerId, memberSince, role, lastRead, displayUnreadProperty);
+        public PlayerChatProperties toPlayerChatProperties(Chat chat) {
+            return new PlayerChatProperties(chat, playerId, memberSince, role, lastRead, displayUnreadProperty);
         }
     }
 
@@ -364,8 +370,8 @@ public class JsonChatDataLoader implements ChatDataLoader {
             this.timestamp = message.timestamp();
         }
 
-        public ChatMessage toChatMessage() {
-            return new ChatMessage(id, senderId, message, timestamp);
+        public ChatMessage toChatMessage(Chat chat) {
+            return new ChatMessage(chat, id, senderId, message, timestamp);
         }
 
         public Long getTimestamp() {

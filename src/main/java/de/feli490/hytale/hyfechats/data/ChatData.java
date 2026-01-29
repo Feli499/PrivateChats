@@ -1,5 +1,6 @@
 package de.feli490.hytale.hyfechats.data;
 
+import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.ChatType;
 import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
@@ -14,7 +15,7 @@ public interface ChatData {
 
     ChatType getChatType();
 
-    Set<PlayerChatProperties> getPlayerChatProperties();
+    Set<PlayerChatProperties> getPlayerChatProperties(Chat chat);
 
-    List<ChatMessage> getMessages();
+    List<ChatMessage> getMessages(Chat chat);
 }
