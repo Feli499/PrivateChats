@@ -13,8 +13,11 @@ import de.feli490.hytale.hyfechats.commands.MsgCommand;
 import de.feli490.hytale.hyfechats.commands.ResponseCommand;
 import de.feli490.hytale.hyfechats.data.ChatDataLoader;
 import de.feli490.hytale.hyfechats.data.ChatDataSaver;
+import de.feli490.hytale.hyfechats.data.DataLoaderConverter;
 import de.feli490.hytale.hyfechats.data.MemoryChatDataLoader;
 import de.feli490.hytale.hyfechats.data.json.JsonChatDataLoader;
+import de.feli490.hytale.hyfechats.data.json.JsonChatDataSaver;
+import de.feli490.hytale.hyfechats.data.json.singlefile.SingleChatFileJsonChatDataLoader;
 import de.feli490.hytale.hyfechats.events.PlayerUnreadChatsOnJoinEvent;
 import de.feli490.utils.hytale.message.MessageBuilderFactory;
 import de.feli490.utils.hytale.playerdata.PlayerDataProvider;
@@ -51,9 +54,14 @@ public class HyFeChatsPlugin extends JavaPlugin {
         ChatDataLoader chatDataLoader;
         ChatDataSaver chatDataSaver;
         try {
-            JsonChatDataLoader chats = new JsonChatDataLoader(getLogger(), getDataDirectory().resolve("chats"));
-            chatDataLoader = chats;
-            chatDataSaver = chats;
+            Path chatsFolder = getDataDirectory().resolve("chats");
+            chatDataLoader = new JsonChatDataLoader(getLogger(), chatsFolder);
+            chatDataSaver = new JsonChatDataSaver(getLogger(), chatsFolder);
+
+            SingleChatFileJsonChatDataLoader singleChatFileJsonChatDataLoader = new SingleChatFileJsonChatDataLoader(getLogger(),
+                                                                                                                     chatsFolder);
+            DataLoaderConverter.convert(singleChatFileJsonChatDataLoader, chatDataSaver);
+
         } catch (Exception e) {
             MemoryChatDataLoader memoryChatDataLoader = new MemoryChatDataLoader();
             chatDataLoader = memoryChatDataLoader;

@@ -84,6 +84,17 @@ public class JsonChatDataSaver implements ChatDataSaver {
                            logger);
     }
 
+    @Override
+    public void deletePlayerChatProperties(PlayerChatProperties playerChatProperties) throws IOException {
+
+        Chat chat = playerChatProperties.getChat();
+        JsonChatFolderContainer chatFolderContainer = getChatFolderContainer(chat);
+
+        UUID playerId = playerChatProperties.getPlayerId();
+        Path playerChatPropertyFile = chatFolderContainer.getPlayerChatPropertyFile(playerId);
+        Files.deleteIfExists(playerChatPropertyFile);
+    }
+
     private JsonChatFolderContainer getChatFolderContainer(Chat chat) {
         return JsonChatFolderContainer.of(chatFolder, chat);
     }

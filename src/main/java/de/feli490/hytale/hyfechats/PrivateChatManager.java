@@ -87,8 +87,7 @@ public class PrivateChatManager {
         Chat group = chatFactory.createGroup(owner);
         memberUUIDs.forEach(uuid -> group.addChatter(uuid, ChatRole.MEMBER));
 
-        chats.add(group);
-        saveChat(group);
+        persistNewChat(group);
         return group;
     }
 
@@ -103,8 +102,7 @@ public class PrivateChatManager {
 
         Chat direct = chatFactory.createDirect(player1, player2);
 
-        chats.add(direct);
-        saveChat(direct);
+        persistNewChat(direct);
         return direct;
     }
 
@@ -116,13 +114,61 @@ public class PrivateChatManager {
                     .toList();
     }
 
-    private void saveChat(Chat chat) {
+    private void persistNewChat(Chat chat) {
+
+        chats.add(chat);
+
+        saveChatMetaData(chat);
+        chat.getMembers()
+            .forEach(this::savePlayerChatProperties);
+        chat.getMessages()
+            .forEach(this::saveMessage);
+    }
+
+    private void saveChatMetaData(Chat chat) {
         try {
-            chatDataSaver.saveChat(chat);
+            chatDataSaver.saveChatMetaData(chat);
         } catch (IOException e) {
             logger.at(Level.SEVERE)
                   .withCause(e)
-                  .log("Could not save chat: " + chat.getId());
+                  .log("Could not save chat metadata: " + chat.getId());
+        }
+    }
+
+    private void saveMessage(ChatMessage message) {
+
+        try {
+            chatDataSaver.saveMessage(message);
+        } catch (IOException e) {
+            UUID chatId = message.chat()
+                                 .getId();
+            logger.at(Level.SEVERE)
+                  .withCause(e)
+                  .log("Could not save chat message (Chat: '" + chatId + "') metadata: " + message);
+        }
+    }
+
+    private void savePlayerChatProperties(PlayerChatProperties playerChatProperties) {
+        try {
+            chatDataSaver.savePlayerChatProperties(playerChatProperties);
+        } catch (IOException e) {
+            UUID chatId = playerChatProperties.getChat()
+                                              .getId();
+            logger.at(Level.SEVERE)
+                  .withCause(e)
+                  .log("Could not save player chat properties (Chat: '" + chatId + "'): " + playerChatProperties);
+        }
+    }
+
+    private void deletePlayerChatProperties(PlayerChatProperties playerChatProperties) {
+        try {
+            chatDataSaver.deletePlayerChatProperties(playerChatProperties);
+        } catch (IOException e) {
+            UUID chatId = playerChatProperties.getChat()
+                                              .getId();
+            logger.at(Level.SEVERE)
+                  .withCause(e)
+                  .log("Could not delete player chat properties (Chat: '" + chatId + "'): " + playerChatProperties);
         }
     }
 
@@ -131,22 +177,22 @@ public class PrivateChatManager {
 
         @Override
         public void onMessage(Chat chat, ChatMessage message) {
-            privateChatManager.saveChat(chat);
+            privateChatManager.saveMessage(message);
         }
 
         @Override
         public void onMemberAdded(Chat chat, PlayerChatProperties member) {
-            privateChatManager.saveChat(chat);
+            privateChatManager.savePlayerChatProperties(member);
         }
 
         @Override
         public void onMemberRemoved(Chat chat, PlayerChatProperties member) {
-            privateChatManager.saveChat(chat);
+            privateChatManager.deletePlayerChatProperties(member);
         }
 
         @Override
         public void onMemberRoleChanged(Chat chat, PlayerChatProperties newRole, ChatRole oldRole) {
-            privateChatManager.saveChat(chat);
+            privateChatManager.savePlayerChatProperties(newRole);
         }
     }
 }

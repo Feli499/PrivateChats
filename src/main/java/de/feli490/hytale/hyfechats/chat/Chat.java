@@ -126,7 +126,7 @@ public class Chat {
         memberChangedListeners.forEach(listener -> listener.onMemberRemoved(this, playerChatProperties));
     }
 
-    private PlayerChatProperties getPlayerChatProperties(UUID playerId) {
+    public PlayerChatProperties getPlayerChatProperties(UUID playerId) {
         return playerChatProperties.stream()
                                    .filter(playerChatRole -> playerChatRole.getPlayerId()
                                                                       .equals(playerId))

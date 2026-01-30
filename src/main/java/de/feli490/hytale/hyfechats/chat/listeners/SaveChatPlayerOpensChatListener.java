@@ -2,6 +2,7 @@ package de.feli490.hytale.hyfechats.chat.listeners;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import de.feli490.hytale.hyfechats.chat.Chat;
+import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import de.feli490.hytale.hyfechats.data.ChatDataSaver;
 import java.io.IOException;
 import java.util.UUID;
@@ -20,7 +21,8 @@ public class SaveChatPlayerOpensChatListener implements PlayerOpensChatListener 
     @Override
     public void onChatOpened(Chat chat, UUID playerId) {
         try {
-            chatDataSaver.saveChat(chat);
+            PlayerChatProperties playerChatProperties = chat.getPlayerChatProperties(playerId);
+            chatDataSaver.savePlayerChatProperties(playerChatProperties);
         } catch (IOException e) {
             logger.at(Level.SEVERE)
                   .withCause(e)

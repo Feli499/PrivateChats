@@ -14,26 +14,27 @@ import java.util.UUID;
 public class JsonChatData implements ChatData {
 
     private final JsonChatMetaData metaData;
-    private final Set<JsonPlayerChatProperties> playerChatProperties;
-    private final List<JsonMessageData> messages;
+    private final Set<JsonPlayerChatProperties> jsonPlayerChatProperties;
+    private final List<JsonMessageData> jsonMessageData;
 
-    public JsonChatData(JsonChatMetaData metaData, List<JsonMessageData> messages, Set<JsonPlayerChatProperties> playerChatProperties) {
+    public JsonChatData(JsonChatMetaData metaData, List<JsonMessageData> jsonMessageData,
+            Set<JsonPlayerChatProperties> jsonPlayerChatProperties) {
         this.metaData = metaData;
-        this.messages = new ArrayList<>(messages);
-        this.playerChatProperties = new HashSet<>(playerChatProperties);
+        this.jsonMessageData = new ArrayList<>(jsonMessageData);
+        this.jsonPlayerChatProperties = new HashSet<>(jsonPlayerChatProperties);
     }
 
     public JsonChatData(Chat chat) {
 
         this.metaData = new JsonChatMetaData(chat);
 
-        this.messages = new ArrayList<>();
+        this.jsonMessageData = new ArrayList<>();
         chat.getMessages()
-            .forEach(message -> messages.add(new JsonMessageData(message)));
+            .forEach(message -> jsonMessageData.add(new JsonMessageData(message)));
 
-        this.playerChatProperties = new HashSet<>();
+        this.jsonPlayerChatProperties = new HashSet<>();
         chat.getMembers()
-            .forEach(member -> playerChatProperties.add(new JsonPlayerChatProperties(member)));
+            .forEach(member -> jsonPlayerChatProperties.add(new JsonPlayerChatProperties(member)));
     }
 
     @Override
@@ -53,11 +54,20 @@ public class JsonChatData implements ChatData {
 
     @Override
     public Set<PlayerChatProperties> getPlayerChatProperties(Chat chat) {
-        return Set.of();
+
+        HashSet<PlayerChatProperties> playerChatProperties = new HashSet<>(jsonPlayerChatProperties.size());
+        for (JsonPlayerChatProperties jsonPlayerChatProperty : jsonPlayerChatProperties) {
+            playerChatProperties.add(jsonPlayerChatProperty.toPlayerChatProperties(chat));
+        }
+        return playerChatProperties;
     }
 
     @Override
     public List<ChatMessage> getMessages(Chat chat) {
-        return List.of();
+        ArrayList<ChatMessage> chatMessages = new ArrayList<>(jsonMessageData.size());
+        for (JsonMessageData jsonMessageDatum : jsonMessageData) {
+            chatMessages.add(jsonMessageDatum.toChatMessage(chat));
+        }
+        return chatMessages;
     }
 }

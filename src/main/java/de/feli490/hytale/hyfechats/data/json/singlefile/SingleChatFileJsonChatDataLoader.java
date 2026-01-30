@@ -1,4 +1,4 @@
-package de.feli490.hytale.hyfechats.data.json;
+package de.feli490.hytale.hyfechats.data.json.singlefile;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -14,6 +14,7 @@ import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import de.feli490.hytale.hyfechats.chat.playerchatproperties.DisplayUnreadProperty;
 import de.feli490.hytale.hyfechats.data.ChatData;
 import de.feli490.hytale.hyfechats.data.ChatDataLoader;
+import de.feli490.hytale.hyfechats.data.Deletable;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class SingleChatFileJsonChatDataLoader implements ChatDataLoader {
+public class SingleChatFileJsonChatDataLoader implements ChatDataLoader, Deletable {
 
     private final Path directory;
     private final HytaleLogger logger;
@@ -57,7 +58,8 @@ public class SingleChatFileJsonChatDataLoader implements ChatDataLoader {
         return chats;
     }
 
-    public void deleteFiles() throws IOException {
+    @Override
+    public void deleteAllChats() throws IOException {
 
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory, "*.json")) {
             for (Path path : paths) {

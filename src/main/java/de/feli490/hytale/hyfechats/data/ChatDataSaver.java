@@ -14,4 +14,6 @@ public interface ChatDataSaver {
     void saveMessage(ChatMessage message) throws IOException;
 
     void savePlayerChatProperties(PlayerChatProperties playerChatProperties) throws IOException;
+
+    void deletePlayerChatProperties(PlayerChatProperties playerChatProperties) throws IOException;
 }

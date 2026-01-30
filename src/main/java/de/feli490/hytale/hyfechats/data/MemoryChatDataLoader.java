@@ -32,4 +32,9 @@ public class MemoryChatDataLoader implements ChatDataLoader, ChatDataSaver {
     public void saveChatMetaData(Chat chat) throws IOException {
 
     }
+
+    @Override
+    public void deletePlayerChatProperties(PlayerChatProperties playerChatProperties) throws IOException {
+
+    }
 }

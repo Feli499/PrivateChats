@@ -93,7 +93,8 @@ public class JsonMessageData {
         try (FileReader fileReader = new FileReader(messagesFile.toFile())) {
             List<String> lines = fileReader.readAllLines();
             for (String line : lines) {
-
+                if (line.isBlank())
+                    continue;
                 JsonMessageData decode = JsonMessageData.CODEC.decode(new BsonString(line));
                 messages.add(decode);
             }

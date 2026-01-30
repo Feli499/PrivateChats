@@ -32,7 +32,6 @@ public class JsonChatDataLoader implements ChatDataLoader {
 
         if (!Files.isDirectory(path))
             throw new IllegalArgumentException("Path must be a directory");
-
     }
 
     @Override
