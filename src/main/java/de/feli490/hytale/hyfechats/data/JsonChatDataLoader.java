@@ -1,33 +1,30 @@
 package de.feli490.hytale.hyfechats.data;
 
 import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.util.BsonUtil;
 import de.feli490.hytale.hyfechats.chat.Chat;
 import de.feli490.hytale.hyfechats.chat.ChatMessage;
 import de.feli490.hytale.hyfechats.chat.ChatRole;
 import de.feli490.hytale.hyfechats.chat.ChatType;
 import de.feli490.hytale.hyfechats.chat.PlayerChatProperties;
 import de.feli490.hytale.hyfechats.chat.playerchatproperties.DisplayUnreadProperty;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bson.BsonValue;
+import org.bson.BsonString;
 
-public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
+public class JsonChatDataLoader implements ChatDataLoader {
 
     private final Path directory;
     private final HytaleLogger logger;
@@ -46,200 +43,144 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
     }
 
     @Override
-    public void saveMessage(ChatMessage message) throws IOException {
-
-    }
-
-    @Override
-    public void savePlayerChatProperties(ChatMessage message) throws IOException {
-
-    }
-
-    @Override
     public Collection<ChatData> loadChats() throws IOException {
 
         Set<ChatData> chats = new HashSet<>();
-        try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory, "*.json")) {
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory, Files::isDirectory)) {
             for (Path path : paths) {
-                JsonChatData jsonChatData = RawJsonReader.readSync(path, JsonChatData.CODEC, logger);
-                if (jsonChatData.needsToBeResaved())
-                    saveChat(jsonChatData);
-                chats.add(jsonChatData);
+                ChatData chatData = loadChat(path);
+                chats.add(chatData);
             }
         }
         return chats;
     }
 
-    @Override
-    public void deleteChat(UUID chatId) throws IOException {
-        Files.deleteIfExists(directory.resolve(chatId.toString() + ".json"));
+    private ChatData loadChat(Path path) throws IOException {
+
+        JsonChatMetaData jsonChatMetaData = RawJsonReader.readSync(getMetaDataFile(path), JsonChatMetaData.CODEC, logger);
+        Set<JsonPlayerChatProperties> jsonPlayerChatProperties = JsonPlayerChatProperties.loadFromChatDirectory(path, logger);
+        List<JsonMessageData> jsonMessageData = JsonMessageData.loadFromChatDirectory(path);
+
+        return new JsonChatData(jsonChatMetaData, jsonMessageData, jsonPlayerChatProperties);
     }
 
-    @Override
-    public void saveChat(Chat chat) throws IOException {
-
-        JsonChatData jsonChatData = JsonChatData.fromChat(chat);
-        saveChat(jsonChatData);
+    static Path getMessagesFile(Path path) {
+        return path.resolve("messages.dat");
     }
 
-    private void saveChat(JsonChatData jsonChatData) throws IOException {
-        BsonValue encode = JsonChatData.CODEC.encode(jsonChatData, EmptyExtraInfo.EMPTY);
-        BsonUtil.writeSync(directory.resolve(jsonChatData.getId()
-                                                         .toString() + ".json"), JsonChatData.CODEC, jsonChatData, logger);
+    static Path getMetaDataFile(Path path) {
+        return path.resolve("metadata.json");
     }
 
-    @Override
-    public void saveChats(Collection<Chat> chats) throws IOException {
-        for (Chat chat : chats) {
-            saveChat(chat);
+    static Path getPlayerChatPropertyFile(Path path, UUID playerId) {
+        return getPlayerChatPropertiesDirectory(path).resolve(playerId.toString() + ".json");
+    }
+
+    static Path getPlayerChatPropertiesDirectory(Path path) {
+        return path.resolve("members");
+    }
+
+    private static class JsonChatData implements ChatData {
+
+        private final JsonChatMetaData metaData;
+        private final Set<JsonPlayerChatProperties> playerChatProperties;
+        private final List<JsonMessageData> messages;
+
+        public JsonChatData(JsonChatMetaData metaData, List<JsonMessageData> messages, Set<JsonPlayerChatProperties> playerChatProperties) {
+            this.metaData = metaData;
+            this.messages = new ArrayList<>(messages);
+            this.playerChatProperties = new HashSet<>(playerChatProperties);
+        }
+
+        public JsonChatData(Chat chat) {
+
+            this.metaData = new JsonChatMetaData(chat);
+
+            this.messages = new ArrayList<>();
+            chat.getMessages()
+                .forEach(message -> messages.add(new JsonMessageData(message)));
+
+            this.playerChatProperties = new HashSet<>();
+            chat.getMembers()
+                .forEach(member -> playerChatProperties.add(new JsonPlayerChatProperties(member)));
+        }
+
+        @Override
+        public UUID getId() {
+            return metaData.getId();
+        }
+
+        @Override
+        public long getCreated() {
+            return metaData.getCreated();
+        }
+
+        @Override
+        public ChatType getChatType() {
+            return ChatType.valueOf(metaData.getChatTypeString());
+        }
+
+        @Override
+        public Set<PlayerChatProperties> getPlayerChatProperties(Chat chat) {
+            return Set.of();
+        }
+
+        @Override
+        public List<ChatMessage> getMessages(Chat chat) {
+            return List.of();
         }
     }
 
-    public static class JsonChatData implements ChatData {
+    public static class JsonChatMetaData {
 
-        public static Codec<JsonChatData> CODEC = BuilderCodec.builder(JsonChatDataLoader.JsonChatData.class,
-                                                                       JsonChatDataLoader.JsonChatData::new)
+        public static Codec<JsonChatMetaData> CODEC = BuilderCodec.builder(JsonChatMetaData.class, JsonChatMetaData::new)
                                                               .addField(new KeyedCodec<>("Id", Codec.UUID_STRING),
-                                                                        JsonChatData::setId,
-                                                                        JsonChatData::getId)
+                                                                        JsonChatMetaData::setId,
+                                                                        JsonChatMetaData::getId)
                                                               .addField(new KeyedCodec<>("ChatType", Codec.STRING),
-                                                                        JsonChatData::setChatTypeString,
-                                                                        JsonChatData::getChatTypeString)
+                                                                        JsonChatMetaData::setChatTypeString,
+                                                                        JsonChatMetaData::getChatTypeString)
                                                               .addField(new KeyedCodec<>("Created", Codec.LONG),
-                                                                        JsonChatData::setCreated,
-                                                                        JsonChatData::getCreated)
-                                                              .addField(new KeyedCodec<>("Messages", JsonMessageData.ARRAY_CODEC),
-                                                                        JsonChatData::setJsonMessageData,
-                                                                        JsonChatData::getJsonMessageData)
-                                                              .addField(new KeyedCodec<>("PlayerChatRoles",
-                                                                                         JsonPlayerChatProperties.ARRAY_CODEC),
-                                                                        JsonChatData::setJsonChatRoleData,
-                                                                        _ -> new JsonPlayerChatProperties[0])
-                                                              .addField(new KeyedCodec<>("PlayerChatProperties",
-                                                                                         JsonPlayerChatProperties.ARRAY_CODEC),
-                                                                        JsonChatData::setJsonPlayerChatProperties,
-                                                                        JsonChatData::getJsonPlayerChatProperties)
+                                                                        JsonChatMetaData::setCreated,
+                                                                        JsonChatMetaData::getCreated)
                                                               .build();
 
         private UUID id;
         private ChatType chatType;
         private long created;
 
-        private List<JsonMessageData> messages;
-        private boolean needsToBeResaved = false;
-        private Set<JsonPlayerChatProperties> playerChatProperties = new HashSet<>();
+        private JsonChatMetaData() {}
 
-        public JsonChatData() {}
-
-        public boolean needsToBeResaved() {
-            return needsToBeResaved;
+        public JsonChatMetaData(Chat chat) {
+            this.id = chat.getId();
+            this.chatType = chat.getChatType();
+            this.created = chat.getCreated();
         }
 
-        @Override
         public UUID getId() {
             return id;
         }
 
-        public void setId(UUID id) {
+        private void setId(UUID id) {
             this.id = id;
         }
 
-        @Override
         public long getCreated() {
             return created;
         }
 
-        public void setCreated(long created) {
+        private void setCreated(long created) {
             this.created = created;
-        }
-
-        @Override
-        public ChatType getChatType() {
-            return chatType;
         }
 
         public String getChatTypeString() {
             return chatType.name();
         }
 
-        public void setChatTypeString(String chatType) {
+        private void setChatTypeString(String chatType) {
             this.chatType = ChatType.valueOf(chatType);
         }
 
-        public void setJsonChatRoleData(JsonPlayerChatProperties[] jsonPlayerChatPropertiesArray) {
-
-            if (jsonPlayerChatPropertiesArray == null || jsonPlayerChatPropertiesArray.length == 0)
-                return;
-
-            this.playerChatProperties.addAll(List.of(jsonPlayerChatPropertiesArray));
-            needsToBeResaved = true;
-        }
-
-        public JsonPlayerChatProperties[] getJsonPlayerChatProperties() {
-            return this.playerChatProperties.toArray(new JsonPlayerChatProperties[0]);
-        }
-
-        public void setJsonPlayerChatProperties(JsonPlayerChatProperties[] JsonPlayerChatProperties) {
-            this.playerChatProperties.addAll(List.of(JsonPlayerChatProperties));
-        }
-
-        @Override
-        public Set<PlayerChatProperties> getPlayerChatProperties(Chat chat) {
-
-            Set<PlayerChatProperties> playerChatProperties = new HashSet<>();
-            for (JsonPlayerChatProperties jsonPlayerChatProperties : getJsonPlayerChatProperties()) {
-                playerChatProperties.add(jsonPlayerChatProperties.toPlayerChatProperties(chat));
-            }
-            return playerChatProperties;
-        }
-
-        public void setPlayerChatProperties(Set<PlayerChatProperties> playerChatProperties) {
-            this.playerChatProperties = new HashSet<>(playerChatProperties.size());
-            for (PlayerChatProperties playerChatProperty : playerChatProperties) {
-                this.playerChatProperties.add(new JsonPlayerChatProperties(playerChatProperty));
-            }
-        }
-
-        public JsonMessageData[] getJsonMessageData() {
-            return messages.toArray(new JsonMessageData[0]);
-        }
-
-        public void setJsonMessageData(JsonMessageData[] messages) {
-            this.messages = Arrays.stream(messages)
-                                  .toList();
-        }
-
-        @Override
-        public List<ChatMessage> getMessages(Chat chat) {
-
-            ArrayList<ChatMessage> chatMessages = new ArrayList<>(messages.size());
-            for (JsonMessageData message : messages) {
-                chatMessages.add(message.toChatMessage(chat));
-            }
-            return chatMessages;
-        }
-
-        public void setMessages(List<ChatMessage> messages) {
-
-            this.messages = new ArrayList<>(messages.size());
-            for (ChatMessage message : messages) {
-                this.messages.add(new JsonMessageData(message));
-            }
-        }
-
-        public static JsonChatData fromChat(Chat chat) {
-
-            JsonChatData jsonChatData = new JsonChatData();
-
-            jsonChatData.setId(chat.getId());
-            jsonChatData.setChatTypeString(chat.getChatType()
-                                               .name());
-            jsonChatData.setCreated(chat.getCreated());
-            jsonChatData.setMessages(chat.getMessages());
-            jsonChatData.setPlayerChatProperties(chat.getMembers());
-
-            return jsonChatData;
-        }
     }
 
     public static class JsonPlayerChatProperties {
@@ -262,9 +203,7 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
                                                                                     JsonPlayerChatProperties::setDisplayUnreadProperty,
                                                                                     JsonPlayerChatProperties::getDisplayUnreadPropertyString)
                                                                           .build();
-        public static ArrayCodec<JsonPlayerChatProperties> ARRAY_CODEC = new ArrayCodec<>(CODEC,
-                                                                                          JsonPlayerChatProperties[]::new,
-                                                                                          JsonPlayerChatProperties::new);
+
         private UUID playerId;
         private long memberSince;
         private ChatRole role;
@@ -272,7 +211,7 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
         private long lastRead;
         private DisplayUnreadProperty displayUnreadProperty;
 
-        public JsonPlayerChatProperties() {
+        private JsonPlayerChatProperties() {
             lastRead = System.currentTimeMillis();
             displayUnreadProperty = DisplayUnreadProperty.ALWAYS;
         }
@@ -289,7 +228,7 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return playerId;
         }
 
-        public void setPlayerId(UUID playerId) {
+        private void setPlayerId(UUID playerId) {
             this.playerId = playerId;
         }
 
@@ -297,7 +236,7 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return role.name();
         }
 
-        public void setRole(String role) {
+        private void setRole(String role) {
             this.role = ChatRole.valueOf(role);
         }
 
@@ -305,7 +244,7 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return memberSince;
         }
 
-        public void setMemberSince(long memberSince) {
+        private void setMemberSince(long memberSince) {
             this.memberSince = memberSince;
         }
 
@@ -317,11 +256,11 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return displayUnreadProperty;
         }
 
-        public void setDisplayUnreadProperty(String displayUnreadPropertyString) {
+        private void setDisplayUnreadProperty(String displayUnreadPropertyString) {
             this.displayUnreadProperty = DisplayUnreadProperty.valueOf(displayUnreadPropertyString);
         }
 
-        public void setDisplayUnreadProperty(DisplayUnreadProperty displayUnreadProperty) {
+        private void setDisplayUnreadProperty(DisplayUnreadProperty displayUnreadProperty) {
             this.displayUnreadProperty = displayUnreadProperty;
         }
 
@@ -329,16 +268,34 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return lastRead;
         }
 
-        public void setLastRead(long lastRead) {
+        private void setLastRead(long lastRead) {
             this.lastRead = lastRead;
         }
 
         public PlayerChatProperties toPlayerChatProperties(Chat chat) {
             return new PlayerChatProperties(chat, playerId, memberSince, role, lastRead, displayUnreadProperty);
         }
+
+        public static Set<JsonPlayerChatProperties> loadFromChatDirectory(Path path, HytaleLogger logger) throws IOException {
+
+            Path playerChatPropertiesDirectory = getPlayerChatPropertiesDirectory(path);
+            Set<JsonPlayerChatProperties> jsonPlayerChatPropertySet = new HashSet<>();
+            try (DirectoryStream<Path> playerChatPropertyFiles = Files.newDirectoryStream(playerChatPropertiesDirectory, "*.json")) {
+                for (Path playerChatPropertyFile : playerChatPropertyFiles) {
+                    JsonPlayerChatProperties jsonPlayerChatProperties = RawJsonReader.readSync(playerChatPropertyFile,
+                                                                                               JsonPlayerChatProperties.CODEC,
+                                                                                               logger);
+                    jsonPlayerChatPropertySet.add(jsonPlayerChatProperties);
+                }
+            }
+
+            return jsonPlayerChatPropertySet;
+        }
     }
 
     public static class JsonMessageData {
+
+        private JsonMessageData() {}
 
         public static Codec<JsonMessageData> CODEC = BuilderCodec.builder(JsonMessageData.class, JsonMessageData::new)
                                                                  .addField(new KeyedCodec<>("Id", Codec.UUID_STRING),
@@ -355,13 +312,14 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
                                                                            JsonMessageData::getTimestamp)
                                                                  .build();
 
-        public static ArrayCodec<JsonMessageData> ARRAY_CODEC = new ArrayCodec<>(CODEC, JsonMessageData[]::new, JsonMessageData::new);
         private UUID id;
         private UUID senderId;
         private String message;
         private Long timestamp;
 
-        public JsonMessageData() {}
+        private void setTimestamp(Long timestamp) {
+            this.timestamp = timestamp;
+        }
 
         public JsonMessageData(ChatMessage message) {
             this.id = message.id();
@@ -378,32 +336,42 @@ public class JsonChatDataLoader implements ChatDataLoader, ChatDataSaver {
             return timestamp;
         }
 
-        public void setTimestamp(Long timestamp) {
-            this.timestamp = timestamp;
+        private void setMessage(String message) {
+            this.message = message;
         }
 
         public String getMessage() {
             return message;
         }
 
-        public void setMessage(String message) {
-            this.message = message;
+        private void setSenderId(UUID senderId) {
+            this.senderId = senderId;
         }
 
         public UUID getSenderId() {
             return senderId;
         }
 
-        public void setSenderId(UUID senderId) {
-            this.senderId = senderId;
+        private void setId(UUID id) {
+            this.id = id;
         }
 
         public UUID getId() {
             return id;
         }
 
-        public void setId(UUID id) {
-            this.id = id;
+        public static List<JsonMessageData> loadFromChatDirectory(Path path) throws IOException {
+
+            List<JsonMessageData> messages = new ArrayList<>();
+            Path messagesFile = JsonChatDataLoader.getMessagesFile(path);
+            try (FileReader fileReader = new FileReader(messagesFile.toFile())) {
+                List<String> lines = fileReader.readAllLines();
+                for (String line : lines) {
+
+                    JsonMessageData decode = JsonMessageData.CODEC.decode(new BsonString(line));
+                    messages.add(decode);
+                }
+            }
         }
     }
 }
