@@ -220,4 +220,10 @@ public class Chat {
         chat.playerChatProperties.addAll(chatData.getPlayerChatProperties(chat));
         return chat;
     }
+
+    @Override
+    public String toString() {
+        return "Chat{" + "id=" + id + ", chatType=" + chatType + ", created=" + created + ", playerChatProperties=" + playerChatProperties
+                + ", messages=" + messages + '}';
+    }
 }

@@ -66,4 +66,10 @@ public class PlayerChatProperties {
     public void setLastRead(long lastRead) {
         this.lastRead = lastRead;
     }
+
+    @Override
+    public String toString() {
+        return "PlayerChatProperties{" + "chat=" + chat.getId() + ", playerId=" + playerId + ", memberSince=" + memberSince + ", role="
+                + role + ", lastRead=" + lastRead + ", displayUnreadProperty=" + displayUnreadProperty + '}';
+    }
 }
